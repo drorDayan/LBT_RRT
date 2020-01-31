@@ -57,7 +57,6 @@ class CollisionDetector:
             assert isinstance(f, Face)
             f.set_data({FREESPACE: f.is_unbounded()})
 
-        # TODO: test this with a complex polygon
         for hole in poly.holes():
             insert(arr, [Curve_2(e) for e in hole.edges()])
 
@@ -188,7 +187,6 @@ class CollisionDetector:
 #             return []
 #         search_nearest = True
 #         sort_neighbors = True
-#         # TODO: Consider with a custom distance
 #         # print("pre search")
 #         search = K_neighbor_search(self.tree, query, k, FT(0), search_nearest, Euclidean_distance(), sort_neighbors)
 #         # print("post search")
@@ -202,8 +200,8 @@ def get_batch(robot_num, num_of_points, min_coord, max_coord):
     # v1 = [Point_d(2*robot_num,
     #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
     #      for j in range(num_of_points_in_dest_direction)]
-    batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for i in range(2*robot_num)])
-             for n in range(num_of_points)]
+    batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+             for _ in range(num_of_points)]
     return batch
 
 
@@ -267,7 +265,7 @@ def get_nearest(robot_num, tree, new_points, rand):
 def try_connect_to_dest(graph, tree, dest_point, collision_detector):
     nn = k_nn(tree, k_nearest, dest_point)
     for neighbor in nn:
-        free, x = collision_detector.path_collision_free(neighbor[0], dest_point)
+        free, _ = collision_detector.path_collision_free(neighbor[0], dest_point)
         if free:
             graph[dest_point] = RrtNode(dest_point, graph[neighbor[0]])
             return True
@@ -316,7 +314,7 @@ def generate_path(path, robots, obstacles, destination):
                     new_data[2 * i] = new[2 * i]
                     new_data[2 * i + 1] = new[2 * i + 1]
                     my_new = Point_d(2*robot_num, new_data)
-                    free, x = collision_detector.path_collision_free(near, my_new,
+                    free, _ = collision_detector.path_collision_free(near, my_new,
                                                                      do_single=True, robot_idx=i, first_invalid_idx=idx)
                     if free:
                         new_points.append(my_new)
