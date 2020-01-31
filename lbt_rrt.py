@@ -29,7 +29,8 @@ class RrtNode:
         return ret_path
 
 
-# obs collision detection code: #
+# obs collision detection code:
+# noinspection PyArgumentList
 class CollisionDetector:
     def __init__(self, robot_width, obstacles, robot_num):
         # init obs for collision detection
@@ -131,7 +132,8 @@ class CollisionDetector:
         else:
             robots_to_check = [i for i in range(self.robot_num)]
         for i in robots_to_check:
-            if do_intersect(self.obstacles_arrangement, Curve_2(Point_2(p1[2*i], p1[2*i+1]), Point_2(p2[2*i], p2[2*i+1]))):
+            if do_intersect(self.obstacles_arrangement, Curve_2(Point_2(p1[2*i], p1[2*i+1]),
+                                                                Point_2(p2[2*i], p2[2*i+1]))):
                 return False, i
         # check for robot to robot collision
         if not do_single:
@@ -186,7 +188,7 @@ class CollisionDetector:
 #             return []
 #         search_nearest = True
 #         sort_neighbors = True
-#         # TODO: Experiment with a custom distance (i.e. max between the two 2D-Euclidean distances, I feel like that makes more sense)
+#         # TODO: Consider with a custom distance
 #         # print("pre search")
 #         search = K_neighbor_search(self.tree, query, k, FT(0), search_nearest, Euclidean_distance(), sort_neighbors)
 #         # print("post search")
@@ -200,8 +202,9 @@ def get_batch(robot_num, num_of_points, min_coord, max_coord):
     # v1 = [Point_d(2*robot_num,
     #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
     #      for j in range(num_of_points_in_dest_direction)]
-    return [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for i in range(2*robot_num)])
-            for j in range(num_of_points)]
+    batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for i in range(2*robot_num)])
+             for n in range(num_of_points)]
+    return batch
 
 
 def get_min_max(obstacles):
@@ -222,6 +225,7 @@ def distance_squared(robot_num, p1, p2):
     return sum([(p1[i] - p2[i]) * (p1[i] - p2[i]) for i in range(2*robot_num)], FT(0))
 
 
+# noinspection PyArgumentList
 def steer(robot_num, near, rand, eta):
     dist = FT(sqrt(distance_squared(robot_num, near, rand).to_double()))
     if dist < eta:
@@ -230,6 +234,7 @@ def steer(robot_num, near, rand, eta):
         return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
 
 
+# noinspection PyArgumentList
 def k_nn(tree, k, query):
     search_nearest = True
     sort_neighbors = True
