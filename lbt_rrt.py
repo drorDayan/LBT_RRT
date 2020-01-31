@@ -38,7 +38,8 @@ class CollisionDetector:
         inflated_obstacles = [Polygon_2([p for p in obs]) for obs in obstacles]
         c_space_obstacles = [minkowski_sum_by_full_convolution_2(one_width_square, obs) for obs in inflated_obstacles]
         c_space_arrangements = [self.polygon_with_holes_to_arrangement(obs) for obs in c_space_obstacles]
-        self.obstacles_arrangement = self.overlay_multiple_arrangements(c_space_arrangements, self.merge_faces_by_freespace_flag)
+        self.obstacles_arrangement = self.overlay_multiple_arrangements(c_space_arrangements,
+                                                                        self.merge_faces_by_freespace_flag)
         self.obstacles_point_locator = Arr_trapezoid_ric_point_location(self.obstacles_arrangement)
         self.double_width_square_arrangement = self.polygon_with_holes_to_arrangement(double_width_square)
         self.double_width_square_point_locator = Arr_trapezoid_ric_point_location(self.double_width_square_arrangement)
@@ -194,7 +195,7 @@ class CollisionDetector:
 #         return lst
 
 
-def get_batch(robot_num, num_of_points, min_coord, max_coord, dest_p):
+def get_batch(robot_num, num_of_points, min_coord, max_coord):
     # num_of_points_in_dest_direction = random.randint(0, num_of_points/5)
     # v1 = [Point_d(2*robot_num,
     #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
@@ -229,18 +230,19 @@ def steer(robot_num, near, rand, eta):
         return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
 
 
-def k_nn(tree, k, query, eps):
+def k_nn(tree, k, query):
     search_nearest = True
     sort_neighbors = True
-    # TODO: Experiment with a custom distance (i.e. max between the two 2D-Euclidean distances, I feel like that makes more sense)
-    search = K_neighbor_search(tree, query, k, eps, search_nearest, Euclidean_distance(), sort_neighbors)
+    nn_eps = FT(0)
+    # TODO: Consider with a custom distance
+    search = K_neighbor_search(tree, query, k, nn_eps, search_nearest, Euclidean_distance(), sort_neighbors)
     lst = []
     search.k_neighbors(lst)
     return lst
 
 
 def get_nearest(robot_num, tree, new_points, rand):
-    nn = k_nn(tree, 1, rand, FT(0))
+    nn = k_nn(tree, 1, rand)
     nn_in_tree = nn[0]
     if len(new_points) == 0:
         return nn_in_tree[0]
@@ -258,7 +260,7 @@ def get_nearest(robot_num, tree, new_points, rand):
 
 
 def try_connect_to_dest(graph, tree, dest_point, collision_detector):
-    nn = k_nn(tree, k_nearest, dest_point, FT(0))
+    nn = k_nn(tree, k_nearest, dest_point)
     for neighbor in nn:
         free, x = collision_detector.path_collision_free(neighbor[0], dest_point)
         if free:
@@ -293,7 +295,7 @@ def generate_path(path, robots, obstacles, destination):
     while True:
         print("new batch, time= ", time.time() - start)
         # I use a batch so that the algorithm can be iterative
-        batch = get_batch(robot_num, num_of_points_in_batch, min_coord, max_coord, dest_point)
+        batch = get_batch(robot_num, num_of_points_in_batch, min_coord, max_coord)
         new_points = []
         for p in batch:
             near = get_nearest(robot_num, tree, new_points, p)
