@@ -304,6 +304,7 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
     if len(valid_neighbors) > 0:
         best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
         graph.insert_new_node(best, dest_point)
+        return True
     return False
 
 
@@ -354,9 +355,10 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
     return
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300), min_time=300):
+def generate_path(path, robots, obstacles, destination, epsilon=FT(1/3000), time_to_run=600):
     # random.seed(0)  # for tests
     start = time.time()
+    print("running, epsilon = ", epsilon, "time to run = ", time_to_run)
     robot_num = len(robots)
     robot_width = FT(1)
     validate_input(robots, destination, robot_width)
@@ -368,7 +370,7 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300), min_t
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
     neighbor_finder = NeighborsFinder(vertices)
-    while True:
+    while time.time()-start < time_to_run:
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
         near = neighbor_finder.get_nearest(new_point)
         new = steer(robot_num, near, new_point, steer_eta)
@@ -377,24 +379,21 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300), min_t
             vertices.append(new)
             graph.insert_new_node(near, new)
             neighbor_finder.add_points([new])
+
+            # rewiring phase
             curr_nn_to_consider = neighbor_finder.get_k_nearest(new, 1+int(log(graph.num_of_nodes) * k_rrg))
             for neighbor in curr_nn_to_consider:
                 consider_edge(graph, neighbor, new, epsilon, collision_detector)
             for neighbor in curr_nn_to_consider:
                 consider_edge(graph, new, neighbor, epsilon, collision_detector)
-        if time.time()-start > min_time:
-            # print("vertices amount: ", len(vertices), "time= ", time.time() - start)
-            if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
-                break
-            else:
-                print("no path found in time")
-                break
-    d_path = []
-    graph.get_path_to_node(dest_point, d_path)
-    for dp in d_path:
-        path.append([Point_2(dp[2*i], dp[2*i+1]) for i in range(robot_num)])
-    # print("k_nearest = ", k_nearest)
-    # print("steer_eta = ", steer_eta)
-    # print("num_of_points_in_batch = ", num_of_points_in_batch)
-    # print("used single robot movement:", do_use_single_robot_movement)
-    print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices), "steer_eta = ", steer_eta)
+
+    if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
+        d_path = []
+        graph.get_path_to_node(dest_point, d_path)
+        for dp in d_path:
+            path.append([Point_2(dp[2 * i], dp[2 * i + 1]) for i in range(robot_num)])
+        print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices),
+              "cost = ", graph.nodes[dest_point].t_cost)
+    else:
+        print("no path found in time")
+        print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices))
