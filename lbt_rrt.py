@@ -345,10 +345,11 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
                 heapq.heappop(changed_nodes)
             else:
                 # is invalid edge, remove it and update costs
-                # TODO currently ignoring the result of delete_g_edge (which is the changed vertices)
                 graph.delete_g_edge(g_parent, x[1])
-                new_changed_nodes = [(node.g_min_cost[0], node) for _, node in changed_nodes]
-                changed_nodes = new_changed_nodes
+
+                # TODO currently ignoring the result of delete_g_edge (which is the changed vertices)
+                # update changed_nodes and their costs
+                changed_nodes = [(node.g_min_cost[0], node) for _, node in changed_nodes]
                 heapq.heapify(changed_nodes)
         else:
             heapq.heappop(changed_nodes)
