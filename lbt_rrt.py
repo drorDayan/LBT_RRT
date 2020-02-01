@@ -161,14 +161,14 @@ class NeighborsFinder:
         return [nn_in_tree[0] for nn_in_tree in nn]
 
 
-def get_batch(robot_num, num_of_points, min_coord, max_coord):
-    # num_of_points_in_dest_direction = random.randint(0, num_of_points/5)
-    # v1 = [Point_d(2*robot_num,
-    #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
-    #      for j in range(num_of_points_in_dest_direction)]
-    batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
-             for _ in range(num_of_points)]
-    return batch
+# def get_batch(robot_num, num_of_points, min_coord, max_coord):
+#     # num_of_points_in_dest_direction = random.randint(0, num_of_points/5)
+#     # v1 = [Point_d(2*robot_num,
+#     #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
+#     #      for j in range(num_of_points_in_dest_direction)]
+#     batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+#              for _ in range(num_of_points)]
+#     return batch
 
 
 def get_min_max(obstacles):
@@ -176,7 +176,10 @@ def get_min_max(obstacles):
     max_y = max(max(v.y() for v in obs) for obs in obstacles)
     min_x = min(min(v.x() for v in obs) for obs in obstacles)
     min_y = min(min(v.y() for v in obs) for obs in obstacles)
-    return max_x.to_double(), max_y.to_double(), min_x.to_double(), min_y.to_double()
+    assert min_x == min_y and max_x == max_y, "scene should be square"
+    min_coord = min(min_x, min_y)
+    max_coord = min(max_x, max_y)
+    return min_coord.to_double(), max_coord.to_double()
 
 
 def get_square_mid(robot):
@@ -208,35 +211,40 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
     return False
 
 
-def generate_path(path, robots, obstacles, destination):
-    # random.seed(0)  # for tests
-    start = time.time()
+def get_start_and_dest(robots, destination):
     robot_num = len(robots)
-    assert len(destination) == robot_num, "robot amount and destination amount mismatch"
-    robot_width = FT(1)
-    for i in range(robot_num):
-        curr_robot_width = robots[i][1].x() - robots[i][0].x()
-        assert curr_robot_width == FT(1), "robot width is assumed to be 1"
-    do_use_single_robot_movement = False
-    collision_detector = CollisionDetector(robot_width, obstacles, robot_num)
-    max_x, max_y, min_x, min_y = get_min_max(obstacles)
-    assert min_x == min_y and max_x == max_y, "scene should be square"
-    min_coord = min(min_x, min_y)
-    max_coord = min(max_x, max_y)
     start_ref_points = [get_square_mid(robot) for robot in robots]
     target_ref_points = [[dest.x(), dest.y()] for dest in destination]
     start_point = Point_d(2*robot_num, sum(start_ref_points, []))
     dest_point = Point_d(2*robot_num, sum(target_ref_points, []))
+    return start_point, dest_point
+
+
+def validate_input(robots, destination, robot_width):
+    robot_num = len(robots)
+    assert len(destination) == robot_num, "robot amount and destination amount mismatch"
+    for i in range(robot_num):
+        curr_robot_width = robots[i][1].x() - robots[i][0].x()
+        assert curr_robot_width == robot_width, "robot width is assumed to be 1"
+
+
+def generate_path(path, robots, obstacles, destination):
+    # random.seed(0)  # for tests
+    start = time.time()
+    robot_num = len(robots)
+    robot_width = FT(1)
+    validate_input(robots, destination, robot_width)
+
+    min_coord, max_coord = get_min_max(obstacles)
+    start_point, dest_point = get_start_and_dest(robots, destination)
+    collision_detector = CollisionDetector(robot_width, obstacles, robot_num)
 
     vertices = [start_point]
     graph = {start_point: RrtNode(start_point)}
-    # tree = Kd_tree(vertices)
     neighbor_finder = NeighborsFinder(vertices)
     i = 0
     while True:
         i += 1
-        # print("new batch, time= ", time.time() - start)
-        # I use a batch so that the algorithm can be iterative
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
         near = neighbor_finder.get_nearest(new_point)
         new = steer(robot_num, near, new_point, steer_eta)
@@ -245,8 +253,8 @@ def generate_path(path, robots, obstacles, destination):
             vertices.append(new)
             graph[new] = RrtNode(new, graph[near])
             neighbor_finder.add_points([new])
-        # print("vertices amount: ", len(vertices))
-        if i % 100 == 0:
+        if i % 1000 == 100:
+            # print("vertices amount: ", len(vertices), "time= ", time.time() - start)
             if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
                 break
     d_path = []
