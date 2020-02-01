@@ -293,14 +293,16 @@ def steer(robot_num, near, rand, eta):
         return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
 
 
-# called construct_roadmap in some papers
-def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
+def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
     nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
+    valid_neighbors = []
     for neighbor in nn:
         free = collision_detector.path_collision_free(neighbor, dest_point)
         if free:
-            graph.insert_new_node(neighbor, dest_point)
-            return True
+            valid_neighbors.append(neighbor)
+    if len(valid_neighbors) > 0:
+        best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
+        graph.insert_new_node(best, dest_point)
     return False
 
 
@@ -342,7 +344,7 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
             else:
                 # is invalid edge, remove it and update costs
                 changed_nodes2 = graph.delete_g_edge(g_parent, x[1])
-                new_changed_nodes = [(node.g_min_cost[0], node) for c, node in changed_nodes]
+                new_changed_nodes = [(node.g_min_cost[0], node) for _, node in changed_nodes]
                 changed_nodes = new_changed_nodes
                 heapq.heapify(changed_nodes)
         else:
@@ -350,7 +352,7 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
     return
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300)):
+def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300), min_time=300):
     # random.seed(0)  # for tests
     start = time.time()
     robot_num = len(robots)
@@ -364,9 +366,7 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300)):
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
     neighbor_finder = NeighborsFinder(vertices)
-    i = 0
     while True:
-        i += 1
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
         near = neighbor_finder.get_nearest(new_point)
         new = steer(robot_num, near, new_point, steer_eta)
@@ -380,9 +380,12 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/300)):
                 consider_edge(graph, neighbor, new, epsilon, collision_detector)
             for neighbor in curr_nn_to_consider:
                 consider_edge(graph, new, neighbor, epsilon, collision_detector)
-        if i % 1000 == 100:
+        if time.time()-start > min_time:
             # print("vertices amount: ", len(vertices), "time= ", time.time() - start)
-            if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
+            if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
+                break
+            else:
+                print("no path found in time")
                 break
     d_path = []
     graph.get_path_to_node(dest_point, d_path)
