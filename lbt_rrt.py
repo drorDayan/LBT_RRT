@@ -136,7 +136,7 @@ class CollisionDetector:
     def polygon_with_holes_to_arrangement(poly):
         assert isinstance(poly, Polygon_with_holes_2)
         arr = Arrangement_2()
-        insert(arr, [Curve_2(e) for e in poly.outer_boundary().edges()])
+        insert(arr, [Curve_2(edge) for edge in poly.outer_boundary().edges()])
 
         # set the freespace flag for the only current two faces
         for f in arr.faces():
@@ -144,7 +144,7 @@ class CollisionDetector:
             f.set_data({FREESPACE: f.is_unbounded()})
 
         for hole in poly.holes():
-            insert(arr, [Curve_2(e) for e in hole.edges()])
+            insert(arr, [Curve_2(edge) for edge in hole.edges()])
 
         for f in arr.faces():
             assert isinstance(f, Face)
@@ -218,6 +218,7 @@ class CollisionDetector:
         return True
 
 
+# TODO make this class smarter (re-build for the whole tree for every node is bad)
 # noinspection PyArgumentList
 class NeighborsFinder:
     def __init__(self, points=None):
@@ -343,7 +344,8 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
                 heapq.heappop(changed_nodes)
             else:
                 # is invalid edge, remove it and update costs
-                changed_nodes2 = graph.delete_g_edge(g_parent, x[1])
+                # TODO currently ignoring the result of delete_g_edge (which is the changed vertices)
+                graph.delete_g_edge(g_parent, x[1])
                 new_changed_nodes = [(node.g_min_cost[0], node) for _, node in changed_nodes]
                 changed_nodes = new_changed_nodes
                 heapq.heapify(changed_nodes)
