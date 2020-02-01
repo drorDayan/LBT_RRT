@@ -149,50 +149,35 @@ class CollisionDetector:
         return True, 0
 
 
-# class NeighborsFinder:
-#     def __init__(self, robot_num, points):
-#         self.robot_num = robot_num
-#         self.tree = Kd_tree([])
-#         self.points_in_tree = 0
-#         self.num_of_points_in_array = 100
-#         self.point_array = points
-#
-#     def get_nearest(self, point):
-#         if self.points_in_tree > 0:
-#             nn = self.tree_k_nn(1, point)
-#             nn_in_tree = nn[0]
-#         else:
-#             dist = [distance_squared(self.robot_num, point, a_point) for a_point in self.point_array]
-#             min_dist = min(dist)
-#             return self.point_array[dist.index(min_dist)]
-#         if len(self.point_array) == 0:
-#             return nn_in_tree[0]
-#         # check distance from new points
-#         dist = [distance_squared(self.robot_num, point, a_point) for a_point in self.point_array]
-#         min_dist = min(dist)
-#         if min_dist < nn_in_tree[1]:
-#             return self.point_array[dist.index(min_dist)]
-#         return nn_in_tree[0]
-#
-#     def add_points(self, points):
-#         if len(self.point_array) < num_of_points_in_array:
-#             self.point_array += points
-#         else:
-#             self.tree.insert(self.point_array + points)
-#             self.points_in_tree += len(self.point_array)
-#             self.point_array = []
-#
-#     def tree_k_nn(self, k, query):
-#         if self.points_in_tree == 0:
-#             return []
-#         search_nearest = True
-#         sort_neighbors = True
-#         # print("pre search")
-#         search = K_neighbor_search(self.tree, query, k, FT(0), search_nearest, Euclidean_distance(), sort_neighbors)
-#         # print("post search")
-#         lst = []
-#         search.k_neighbors(lst)
-#         return lst
+# noinspection PyArgumentList
+class NeighborsFinder:
+    def __init__(self, points=None):
+        if points is None:
+            self.tree = Kd_tree([])
+        else:
+            self.tree = Kd_tree(points)
+
+    def __tree_k_nn(self, query, k):
+        search_nearest = True
+        sort_neighbors = True
+        epsilon = FT(0)
+        # TODO: Consider with a custom distance
+        search = K_neighbor_search(self.tree, query, k, epsilon, search_nearest, Euclidean_distance(), sort_neighbors)
+        lst = []
+        search.k_neighbors(lst)
+        return lst
+
+    def add_points(self, points):
+        self.tree.insert(points)
+
+    def get_nearest(self, point):
+        nn = self.__tree_k_nn(point, 1)
+        nn_in_tree = nn[0]
+        return nn_in_tree[0]
+
+    def get_k_nearest(self, point, k):
+        nn = self.__tree_k_nn(point, k)
+        return [nn_in_tree[0] for nn_in_tree in nn]
 
 
 def get_batch(robot_num, num_of_points, min_coord, max_coord):
@@ -232,42 +217,12 @@ def steer(robot_num, near, rand, eta):
         return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
 
 
-# noinspection PyArgumentList
-def k_nn(tree, k, query):
-    search_nearest = True
-    sort_neighbors = True
-    nn_eps = FT(0)
-    # TODO: Consider with a custom distance
-    search = K_neighbor_search(tree, query, k, nn_eps, search_nearest, Euclidean_distance(), sort_neighbors)
-    lst = []
-    search.k_neighbors(lst)
-    return lst
-
-
-def get_nearest(robot_num, tree, new_points, rand):
-    nn = k_nn(tree, 1, rand)
-    nn_in_tree = nn[0]
-    if len(new_points) == 0:
-        return nn_in_tree[0]
-    # check distance from new points
-    dist = [distance_squared(robot_num, rand, point) for point in new_points]
-    min_dist = dist[0]
-    min_i = 0
-    for i in range(len(new_points)):
-        if dist[i] < min_dist:
-            min_dist = dist[i]
-            min_i = i
-    if min_dist < nn_in_tree[1]:
-        return new_points[min_i]
-    return nn_in_tree[0]
-
-
-def try_connect_to_dest(graph, tree, dest_point, collision_detector):
-    nn = k_nn(tree, k_nearest, dest_point)
+def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
+    nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
     for neighbor in nn:
-        free, _ = collision_detector.path_collision_free(neighbor[0], dest_point)
+        free, _ = collision_detector.path_collision_free(neighbor, dest_point)
         if free:
-            graph[dest_point] = RrtNode(dest_point, graph[neighbor[0]])
+            graph[dest_point] = RrtNode(dest_point, graph[neighbor])
             return True
     return False
 
@@ -294,14 +249,15 @@ def generate_path(path, robots, obstacles, destination):
 
     vertices = [start_point]
     graph = {start_point: RrtNode(start_point)}
-    tree = Kd_tree(vertices)
+    # tree = Kd_tree(vertices)
+    neighbor_finder = NeighborsFinder(vertices)
     while True:
         print("new batch, time= ", time.time() - start)
         # I use a batch so that the algorithm can be iterative
         batch = get_batch(robot_num, num_of_points_in_batch, min_coord, max_coord)
         new_points = []
         for p in batch:
-            near = get_nearest(robot_num, tree, new_points, p)
+            near = neighbor_finder.get_nearest(p)
             new = steer(robot_num, near, p, steer_eta)
             free, idx = collision_detector.path_collision_free(near, new)
             if free:
@@ -321,15 +277,12 @@ def generate_path(path, robots, obstacles, destination):
                         vertices.append(my_new)
                         graph[my_new] = RrtNode(my_new, graph[near])
 
-        # this in in-efficient if this becomes a bottleneck we should hold an array of kd-trees
-        # each double the size of the previous one
-        # TODO create a valid point distance handler and play with it using constant random (and compare to current)
-        tree.insert(new_points)
+        neighbor_finder.add_points(new_points)
         print("vertices amount: ", len(vertices))
         if len(new_points) < single_robot_movement_if_less_then:
             # print("single robot movement")
             do_use_single_robot_movement = use_single_robot_movement
-        if try_connect_to_dest(graph, tree, dest_point, collision_detector):
+        if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
             break
     d_path = []
     graph[dest_point].get_path_to_here(d_path)
