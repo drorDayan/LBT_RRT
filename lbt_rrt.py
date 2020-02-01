@@ -7,9 +7,6 @@ from math import sqrt
 
 k_nearest = 50
 steer_eta = FT(0.6)
-num_of_points_in_batch = 1200
-single_robot_movement_if_less_then = 20
-use_single_robot_movement = True
 FREESPACE = 'freespace'
 
 # Code: #
@@ -119,34 +116,18 @@ class CollisionDetector:
     # True if collision free
     # False, first robot index that touches an obs if a robot touches an obs
     # False, robot_num if a robot touches another robot
-    def path_collision_free(self, p1, p2, do_single=False, robot_idx=0, first_invalid_idx=0):
+    def path_collision_free(self, p1, p2):
         # check for obs collision
-        if do_single:
-            if robot_idx < first_invalid_idx:
-                robots_to_check = []
-            elif robot_idx > first_invalid_idx:
-                robots_to_check = [robot_idx]
-            else:
-                return False, robot_idx
-        else:
-            robots_to_check = [i for i in range(self.robot_num)]
-        for i in robots_to_check:
+        for i in [i for i in range(self.robot_num)]:
             if do_intersect(self.obstacles_arrangement, Curve_2(Point_2(p1[2*i], p1[2*i+1]),
                                                                 Point_2(p2[2*i], p2[2*i+1]))):
-                return False, i
+                return False
         # check for robot to robot collision
-        if not do_single:
-            for i in range(self.robot_num):
-                for j in range(i + 1, self.robot_num):
-                    if self.two_robot_intersect(p1, p2, i, j):
-                        return False, self.robot_num
-        else:
-            for j in range(self.robot_num):
-                if j == robot_idx:
-                    continue
-                if self.two_robot_intersect(p1, p2, robot_idx, j):
-                    return False, self.robot_num
-        return True, 0
+        for i in range(self.robot_num):
+            for j in range(i + 1, self.robot_num):
+                if self.two_robot_intersect(p1, p2, i, j):
+                    return False
+        return True
 
 
 # noinspection PyArgumentList
@@ -220,7 +201,7 @@ def steer(robot_num, near, rand, eta):
 def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
     nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
     for neighbor in nn:
-        free, _ = collision_detector.path_collision_free(neighbor, dest_point)
+        free = collision_detector.path_collision_free(neighbor, dest_point)
         if free:
             graph[dest_point] = RrtNode(dest_point, graph[neighbor])
             return True
@@ -251,39 +232,23 @@ def generate_path(path, robots, obstacles, destination):
     graph = {start_point: RrtNode(start_point)}
     # tree = Kd_tree(vertices)
     neighbor_finder = NeighborsFinder(vertices)
+    i = 0
     while True:
-        print("new batch, time= ", time.time() - start)
+        i += 1
+        # print("new batch, time= ", time.time() - start)
         # I use a batch so that the algorithm can be iterative
-        batch = get_batch(robot_num, num_of_points_in_batch, min_coord, max_coord)
-        new_points = []
-        for p in batch:
-            near = neighbor_finder.get_nearest(p)
-            new = steer(robot_num, near, p, steer_eta)
-            free, idx = collision_detector.path_collision_free(near, new)
-            if free:
-                new_points.append(new)
-                vertices.append(new)
-                graph[new] = RrtNode(new, graph[near])
-            elif do_use_single_robot_movement:
-                for i in range(robot_num):
-                    new_data = [near[j] for j in range(2*robot_num)]
-                    new_data[2 * i] = new[2 * i]
-                    new_data[2 * i + 1] = new[2 * i + 1]
-                    my_new = Point_d(2*robot_num, new_data)
-                    free, _ = collision_detector.path_collision_free(near, my_new,
-                                                                     do_single=True, robot_idx=i, first_invalid_idx=idx)
-                    if free:
-                        new_points.append(my_new)
-                        vertices.append(my_new)
-                        graph[my_new] = RrtNode(my_new, graph[near])
-
-        neighbor_finder.add_points(new_points)
-        print("vertices amount: ", len(vertices))
-        if len(new_points) < single_robot_movement_if_less_then:
-            # print("single robot movement")
-            do_use_single_robot_movement = use_single_robot_movement
-        if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
-            break
+        new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+        near = neighbor_finder.get_nearest(new_point)
+        new = steer(robot_num, near, new_point, steer_eta)
+        free = collision_detector.path_collision_free(near, new)
+        if free:
+            vertices.append(new)
+            graph[new] = RrtNode(new, graph[near])
+            neighbor_finder.add_points([new])
+        # print("vertices amount: ", len(vertices))
+        if i % 100 == 0:
+            if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector):
+                break
     d_path = []
     graph[dest_point].get_path_to_here(d_path)
     for dp in d_path:
