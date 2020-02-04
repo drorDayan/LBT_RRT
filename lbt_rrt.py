@@ -232,7 +232,7 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_t
     k_rrg = get_k_rrg(robot_num)
     min_coord, max_coord = get_min_max(obstacles)
     start_point, dest_point = get_start_and_dest(robots, destination)
-    collision_detector = CollisionDetectorSlow(robot_width, obstacles, robot_num)
+    collision_detector = CollisionDetectorFast(robot_width, obstacles, robot_num)
 
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
