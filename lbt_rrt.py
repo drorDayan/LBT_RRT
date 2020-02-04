@@ -1,11 +1,10 @@
-from arr2_epec_seg_ex import *
 import random
 import time
 import heapq
 from collision_detector import CollisionDetectorFast, CollisionDetectorSlow
 from neighbor_finder import NeighborsFinder
-from math import sqrt, e, log
-
+from math import e, log
+from rrt_common import *
 # Configurable Variables: #
 
 k_nearest = 50
@@ -102,20 +101,6 @@ class LbtRrtGraph:
         return changed_nodes_prices
 
 
-# class RrtNode:
-#     def __init__(self, pt, pr=None, n=0):
-#         self.point = pt
-#         self.parent = pr
-#         self.nval = n  # Will be used to store distance to this point, etc.
-#
-#     def get_path_to_here(self, ret_path):
-#         cur = self
-#         while cur is not None:
-#             ret_path.insert(0, cur.point)
-#             cur = cur.parent
-#         return ret_path
-
-
 def path_cost(robot_num, p1, p2):
     return distance_squared(robot_num, p1, p2)
 
@@ -130,70 +115,9 @@ def path_cost(robot_num, p1, p2):
 #     return batch
 
 
-def get_min_max(obstacles):
-    max_x = max(max(v.x() for v in obs) for obs in obstacles)
-    max_y = max(max(v.y() for v in obs) for obs in obstacles)
-    min_x = min(min(v.x() for v in obs) for obs in obstacles)
-    min_y = min(min(v.y() for v in obs) for obs in obstacles)
-    assert min_x == min_y and max_x == max_y, "scene should be square"
-    min_coord = min(min_x, min_y)
-    max_coord = min(max_x, max_y)
-    return min_coord.to_double(), max_coord.to_double()
-
-
-def get_square_mid(robot):
-    x = (robot[0].x()+robot[1].x())/FT(2)
-    y = (robot[1].y()+robot[2].y())/FT(2)
-    return [x, y]
-
-
-def distance_squared(robot_num, p1, p2):
-    return sum([(p1[i] - p2[i]) * (p1[i] - p2[i]) for i in range(2*robot_num)], FT(0))
-
-
-# noinspection PyArgumentList
-def steer(robot_num, near, rand, eta):
-    dist = FT(sqrt(distance_squared(robot_num, near, rand).to_double()))
-    if dist < eta:
-        return rand
-    else:
-        return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
-
-
-def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
-    nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
-    valid_neighbors = []
-    for neighbor in nn:
-        free = collision_detector.path_collision_free(neighbor, dest_point)
-        if free:
-            valid_neighbors.append(neighbor)
-    if len(valid_neighbors) > 0:
-        best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
-        graph.insert_new_node(best, dest_point)
-        return True
-    return False
-
-
 # return e*(1+1/d) as in the OMPL implementation who claims that the RRT* used constant
 def get_k_rrg(robot_num):
     return e + (e/(2*robot_num))
-
-
-def get_start_and_dest(robots, destination):
-    robot_num = len(robots)
-    start_ref_points = [get_square_mid(robot) for robot in robots]
-    target_ref_points = [[dest.x(), dest.y()] for dest in destination]
-    start_point = Point_d(2*robot_num, sum(start_ref_points, []))
-    dest_point = Point_d(2*robot_num, sum(target_ref_points, []))
-    return start_point, dest_point
-
-
-def validate_input(robots, destination, robot_width):
-    robot_num = len(robots)
-    assert len(destination) == robot_num, "robot amount and destination amount mismatch"
-    for i in range(robot_num):
-        curr_robot_width = robots[i][1].x() - robots[i][0].x()
-        assert curr_robot_width == robot_width, "robot width is assumed to be 1"
 
 
 def consider_edge(graph, x1, x2, epsilon, collision_detector):
@@ -220,6 +144,20 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
         else:
             heapq.heappop(changed_nodes)
     return
+
+
+def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
+    nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
+    valid_neighbors = []
+    for neighbor in nn:
+        free = collision_detector.path_collision_free(neighbor, dest_point)
+        if free:
+            valid_neighbors.append(neighbor)
+    if len(valid_neighbors) > 0:
+        best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
+        graph.insert_new_node(best, dest_point)
+        return True
+    return False
 
 
 def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=60):
