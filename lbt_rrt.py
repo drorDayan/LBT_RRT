@@ -160,7 +160,7 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
     return False
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=60):
+def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=600):
     # random.seed(0)  # for tests
     start = time.time()
     print("running, epsilon = ", epsilon, "time to run = ", time_to_run)
