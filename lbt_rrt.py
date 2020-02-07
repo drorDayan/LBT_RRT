@@ -160,7 +160,8 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
     return False
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=600):
+def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=600,
+                  use_fast_collision_detector=True):
     # random.seed(0)  # for tests
     start = time.time()
     print("running, epsilon = ", epsilon, "time to run = ", time_to_run)
@@ -170,11 +171,14 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_t
     k_rrg = get_k_rrg(robot_num)
     min_coord, max_coord = get_min_max(obstacles)
     start_point, dest_point = get_start_and_dest(robots, destination)
-    collision_detector = CollisionDetectorFast(robot_width, obstacles, robot_num)
+    if use_fast_collision_detector:
+        collision_detector = CollisionDetectorFast(robot_width, obstacles, robot_num)
+    else:
+        collision_detector = CollisionDetectorSlow(robot_width, obstacles, robot_num)
 
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
-    neighbor_finder = NeighborsFinder(vertices)
+    neighbor_finder = NeighborsFinder(robot_num, vertices)
     while time.time()-start < time_to_run:
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
         near = neighbor_finder.get_nearest(new_point)

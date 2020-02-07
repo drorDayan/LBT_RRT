@@ -1,78 +1,78 @@
 from arr2_epec_seg_ex import *
+from rrt_common import distance_squared
+import heapq
 
 
-# TODO make this class smarter (re-build for the whole tree for every node is bad)
 # noinspection PyArgumentList
 class NeighborsFinder:
-    def __init__(self, points=None):
-        self.big_tree_points = []
-        self.big_tree = Kd_tree([])
+    def __init__(self, robot_num, points=None):
+        self.robot_num = robot_num
         if points is None:
-            self.small_tree = Kd_tree([])
-            self.small_tree_points = []
+            self.array = []
         else:
-            self.small_tree = Kd_tree(points)
-            self.small_tree_points = points
+            self.array = points
+        # trees array will have max size, points_array, kd_tree
+        self.trees = [[130, [], Kd_tree([])]]
 
     def __tree_k_nn(self, query, k):
         search_nearest = True
         sort_neighbors = True
         epsilon = FT(0)
-        # TODO: Consider with a custom distance
-        search1 = K_neighbor_search(self.small_tree, query, k, epsilon, search_nearest, Euclidean_distance(),
-                                    sort_neighbors)
-        search2 = K_neighbor_search(self.big_tree, query, k, epsilon, search_nearest, Euclidean_distance(),
-                                    sort_neighbors)
-        lst1 = []
-        search1.k_neighbors(lst1)
-        lst2 = []
-        search2.k_neighbors(lst2)
-        return lst1, lst2
+        res = []
+        for _, points_array, kd_tree in self.trees:
+            if len(points_array) > 0:
+                search = K_neighbor_search(kd_tree, query, k, epsilon, search_nearest, Euclidean_distance(),
+                                           sort_neighbors)
+                lst = []
+                search.k_neighbors(lst)
+                res += lst
+        return res
 
     def add_points(self, points):
-        if len(self.small_tree_points) < 300:
-            self.small_tree.insert(points)
-            self.small_tree_points += points
+        if len(self.array) < 64:
+            self.array += points
         else:
-            self.big_tree.insert(self.small_tree_points + points)
-            self.big_tree_points += self.small_tree_points + points
-            self.small_tree_points = []
-            self.small_tree = Kd_tree([])
+            num_of_points = len(self.array) + len(points)
+            i = 0
+            while i < len(self.trees):
+                if self.trees[i][0] > num_of_points+len(self.trees[i][1]):
+                    points_to_add = self.array + points
+                    self.array = []
+                    for j in range(0, i):
+                        points_to_add += self.trees[j][1]
+                        self.trees[j][1] = []
+                        self.trees[j][2] = Kd_tree([])
+                    self.trees[i][1] += points_to_add
+                    self.trees[i][2].insert(points_to_add)
+                    return
+                i += 1
+            points_to_add = self.array + points
+            self.array = []
+            for i in range(0, len(self.trees)):
+                points_to_add += self.trees[i][1]
+                self.trees[i][1] = []
+                self.trees[i][2] = Kd_tree([])
+            self.trees.append([self.trees[len(self.trees) - 1][0]*2, points_to_add, Kd_tree(points_to_add)])
+            print(self.trees[len(self.trees) - 1][0])
+            return
 
     def get_nearest(self, point):
-        nn1, nn2 = self.__tree_k_nn(point, 1)
-        if len(nn2) == 0:
-            return nn1[0][0]
-        nn2_in_tree = nn2[0]
-        if len(nn1) == 0:
-            return nn2_in_tree[0]
-        nn1_in_tree = nn1[0]
-        if nn1_in_tree[1] < nn2_in_tree[1]:
-            return nn1_in_tree[0]
-        return nn2_in_tree[0]
+        nn = self.__tree_k_nn(point, 1)
+        if len(nn) == 0:
+            return min(self.array, key=lambda p: distance_squared(self.robot_num, point, p))
+        nn_min = min(nn, key=lambda n: n[1])
+        if len(self.array) == 0:
+            return nn_min[0]
+        arr_min = min(self.array, key=lambda p: distance_squared(self.robot_num, point, p))
+        if nn_min[1] < distance_squared(self.robot_num, point, arr_min):
+            return nn_min[0]
+        else:
+            return arr_min
 
     def get_k_nearest(self, point, k):
-        nn1, nn2 = self.__tree_k_nn(point, k)
-        if len(nn2) == 0:
-            return [nn_in_tree[0] for nn_in_tree in nn1]
-        if len(nn1) == 0:
-            return [nn_in_tree[0] for nn_in_tree in nn1]
+        nn = self.__tree_k_nn(point, k)
+        heap_nn = [(d, n) for n, d in nn] + [(distance_squared(self.robot_num, point, n), n) for n in self.array]
+        heapq.heapify(heap_nn)
+        return [heapq.heappop(heap_nn)[1] for _ in range(k)]
 
-        size_1 = len(nn1)
-        size_2 = len(nn2)
-        res = [0]*min(k, size_1+size_2)
-        i, j = 0, 0
-        while i < size_1 and j < size_2 and i+j < k:
-            if nn1[i][1] < nn2[j][1]:
-                res[i+j] = nn1[i][0]
-                i += 1
-            else:
-                res[i+j] = nn2[j][0]
-                j += 1
-        while i < size_1 and i+j < k:
-            res[i+j] = nn1[i][0]
-            i += 1
-        while j < size_2 and i+j < k:
-            res[i+j] = nn2[j][0]
-            j += 1
-        return res
+
