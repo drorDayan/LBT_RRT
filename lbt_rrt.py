@@ -105,16 +105,6 @@ def path_cost(robot_num, p1, p2):
     return distance_squared(robot_num, p1, p2)
 
 
-# def get_batch(robot_num, num_of_points, min_coord, max_coord):
-#     # num_of_points_in_dest_direction = random.randint(0, num_of_points/5)
-#     # v1 = [Point_d(2*robot_num,
-#     #              [(FT(random.uniform(min_coord, max_coord))+dest_p[i])/FT(2) for i in range(2*robot_num)])
-#     #      for j in range(num_of_points_in_dest_direction)]
-#     batch = [Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
-#              for _ in range(num_of_points)]
-#     return batch
-
-
 # return e*(1+1/d) as in the OMPL implementation who claims that the RRT* used constant
 def get_k_rrg(robot_num):
     return e + (e/(2*robot_num))
@@ -203,6 +193,8 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_t
             path.append([Point_2(dp[2 * i], dp[2 * i + 1]) for i in range(robot_num)])
         print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices),
               "cost = ", graph.nodes[dest_point].t_cost)
+        return len(vertices), graph.nodes[dest_point].t_cost
     else:
         print("no path found in time")
         print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices))
+        return len(vertices), FT(999999999999)

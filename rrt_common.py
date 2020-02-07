@@ -44,6 +44,7 @@ def get_start_and_dest(robots, destination):
 def validate_input(robots, destination, robot_width):
     robot_num = len(robots)
     assert len(destination) == robot_num, "robot amount and destination amount mismatch"
+    assert robot_num > 0, "robot amount must be greater then 0"
     for i in range(robot_num):
         curr_robot_width = robots[i][1].x() - robots[i][0].x()
         assert curr_robot_width == robot_width, "robot width is assumed to be 1"

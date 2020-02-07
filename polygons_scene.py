@@ -209,6 +209,15 @@ def set_destinations():
 def animate_path():
   gui.play_queue()
 
+def run_tests():
+  path = []
+  path_name = gui.get_field(5)
+  gp = importlib.import_module(path_name)
+  # for steer_eta in [FT(0.1), FT(0.2), FT(0.3), FT(0.4), FT(0.5), FT(0.6), FT(0.7), FT(0.8), FT(0.9), FT(1.0), FT(1.1), FT(1.2), FT(1.3), FT(1.4), FT(1.5)]:
+  #   for i in range(10):
+  gp.generate_path(path, ps.robots, ps.obstacles, ps.destinations)
+  # print("Generated path via", path_name + ".generate_path")
+
 if __name__ == "__main__":
   import sys
   app = QtWidgets.QApplication(sys.argv)
@@ -218,6 +227,7 @@ if __name__ == "__main__":
   gui.set_field(0, "scenes/scene0")
   gui.set_field(3, "lbt_rrt")
   gui.set_field(4, "path0.txt")
+  gui.set_field(5, "run_tests")
   #gui.set_field(5, "path_out.txt")
   gui.set_logic(0, set_up_scene)
   gui.set_button_text(0, "Load scene")
@@ -228,8 +238,8 @@ if __name__ == "__main__":
   gui.set_button_text(3, "Generate path")
   gui.set_logic(4, load_path)
   gui.set_button_text(4, "Load path")
-  #gui.set_logic(5, save_path)
-  gui.set_button_text(5, "unused")
+  gui.set_logic(5, run_tests)
+  gui.set_button_text(5, "run tests")
   gui.set_logic(6, animate_path)
   gui.set_button_text(6, "Animate movement along path")
   gui.set_logic(7, is_path_valid)

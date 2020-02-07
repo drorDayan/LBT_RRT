@@ -2,7 +2,7 @@ from arr2_epec_seg_ex import *
 import heapq
 
 
-smallest_tree_size = 500
+smallest_tree_size = 300
 tree_size_mul = 100
 
 
