@@ -178,7 +178,7 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_t
 
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
-    neighbor_finder = NeighborsFinder(robot_num, vertices)
+    neighbor_finder = NeighborsFinder(vertices)
     while time.time()-start < time_to_run:
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
         near = neighbor_finder.get_nearest(new_point)
