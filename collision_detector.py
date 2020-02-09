@@ -118,6 +118,7 @@ class CollisionDetectorFast:
                 if abs(FT.to_double(p[2 * r1] - p[2 * r2])) < self.robot_width and \
                         abs(FT.to_double(p[2 * r1 + 1] - p[2 * r2 + 1])) < self.robot_width:
                     return False
+        return True
 
 
 # noinspection PyArgumentList
