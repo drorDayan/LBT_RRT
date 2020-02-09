@@ -65,6 +65,7 @@ def is_in_free_face(point_locator, point):
 
 
 # obs collision detection code:
+# noinspection PyArgumentList
 class CollisionDetectorFast:
     def __init__(self, robot_width, obstacles, robot_num):
         # init obs for collision detection
@@ -78,6 +79,7 @@ class CollisionDetectorFast:
         self.double_width_square_arrangement = polygon_with_holes_to_arrangement(double_width_square)
         self.double_width_square_point_locator = Arr_trapezoid_ric_point_location(self.double_width_square_arrangement)
         self.robot_num = robot_num
+        self.robot_width = robot_width.to_double()
 
     @staticmethod
     def get_normal_movement_vector(p1, p2, i, j):
@@ -107,6 +109,16 @@ class CollisionDetectorFast:
                     return False
         return True
 
+    def is_valid_conf(self, p):
+        for robot_index in range(self.robot_num):
+            if not is_in_free_face(self.obstacles_point_locator, Point_2(p[robot_index*2], p[robot_index*2+1])):
+                return False
+        for r1 in range(self.robot_num):
+            for r2 in range(r1+1, self.robot_num):
+                if abs(FT.to_double(p[2 * r1] - p[2 * r2])) < self.robot_width and \
+                        abs(FT.to_double(p[2 * r1 + 1] - p[2 * r2 + 1])) < self.robot_width:
+                    return False
+
 
 # noinspection PyArgumentList
 class CollisionDetectorSlow:
@@ -114,6 +126,7 @@ class CollisionDetectorSlow:
 
     def __init__(self, robot_width, obstacles, robot_num):
         self.robot_num = robot_num
+        self.robot_width = robot_width.to_double()
         inf_sq_coord = (robot_width+CollisionDetectorSlow.inflation_epsilon)/FT(2)
         v1 = Point_2(inf_sq_coord, inf_sq_coord)
         v2 = Point_2(inf_sq_coord * FT(-1), inf_sq_coord)
@@ -126,15 +139,14 @@ class CollisionDetectorSlow:
         single_arrangement = overlay_multiple_arrangements(arrangements, merge_faces_by_freespace_flag)
         self.point_locator = Arr_landmarks_point_location(single_arrangement)
 
-    @staticmethod
-    def is_valid_config(point_locator, conf, robot_num):
+    def is_valid_config(self, p):
         epsilon = CollisionDetectorSlow.inflation_epsilon.to_double()
-        for j in range(robot_num):
-            if not is_in_free_face(point_locator, Point_2(conf[2 * j], conf[2 * j + 1])):
+        for j in range(self.robot_num):
+            if not is_in_free_face(self.point_locator, Point_2(p[2 * j], p[2 * j + 1])):
                 return False
-            for k in range(j + 1, robot_num):
-                if abs(FT.to_double(conf[2 * j] - conf[2 * k])) < 1 + epsilon and \
-                        abs(FT.to_double(conf[2 * j + 1] - conf[2 * k + 1])) < 1 + epsilon:
+            for k in range(j + 1, self.robot_num):
+                if abs(FT.to_double(p[2 * j] - p[2 * k])) < self.robot_width + epsilon and \
+                        abs(FT.to_double(p[2 * j + 1] - p[2 * k + 1])) < self.robot_width + epsilon:
                     return False
         return True
 
