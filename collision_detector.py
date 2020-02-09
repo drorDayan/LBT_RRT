@@ -2,7 +2,7 @@ from arr2_epec_seg_ex import *
 from math import sqrt
 
 FREESPACE = 'freespace'
-
+DENSE = 'dense'
 
 # noinspection PyArgumentList
 def polygon_with_holes_to_arrangement(poly):
@@ -62,6 +62,40 @@ def is_in_free_face(point_locator, point):
         located_obj.get_face(face)
         return face.data()[FREESPACE]
     return False
+
+
+# noinspection PyArgumentList
+def vertical_decompose(arr):
+    assert isinstance(arr, Arrangement_2)
+    d = []
+    verticals = Arrangement_2()
+    decompose(arr, d)
+    for pair in d:
+        # pair is a tuple
+        # pair[0] is an arrangement vertex
+        # pair[1] is a pair holding the objects (vertex, halfedge, or face) above and below the vertex,
+        # that is, the objects hit by the vertical walls emanating from the vertex
+        v0 = pair[0]
+        for obj in pair[1]:
+            if obj.is_vertex():
+                v1 = Vertex()
+                obj.get_vertex(v1)
+                insert(verticals, Curve_2(Segment_2(v0.point(), v1.point())))
+            elif obj.is_halfedge():
+                he = Halfedge()
+                obj.get_halfedge(he)
+                v1 = Point_2(v0.point().x(), he.curve().line().y_at_x(v0.point().x()))
+                insert(verticals, Curve_2(Segment_2(v0.point(), v1)))
+            else:  # obj is a face
+                # can only happen for the vertices of the bbox, so IGNORE
+                pass
+
+    res = Arrangement_2()
+    for f in verticals.faces():
+        f.set_data({FREESPACE: True})
+    overlay(arr, verticals, res, Arr_face_overlay_traits(merge_faces_by_freespace_flag))
+
+    return res
 
 
 # obs collision detection code:
@@ -140,7 +174,7 @@ class CollisionDetectorSlow:
         single_arrangement = overlay_multiple_arrangements(arrangements, merge_faces_by_freespace_flag)
         self.point_locator = Arr_landmarks_point_location(single_arrangement)
 
-    def is_valid_config(self, p):
+    def is_valid_conf(self, p):
         epsilon = CollisionDetectorSlow.inflation_epsilon.to_double()
         for j in range(self.robot_num):
             if not is_in_free_face(self.point_locator, Point_2(p[2 * j], p[2 * j + 1])):
@@ -166,6 +200,96 @@ class CollisionDetectorSlow:
         curr = [p1[i] for i in range(2 * self.robot_num)]
         for i in range(int(sample_amount.to_double())):
             curr = [sum(x, FT(0)) for x in zip(curr, diff_vec)]
-            if not self.is_valid_config(self.point_locator, curr, self.robot_num):
+            if not self.is_valid_conf(curr):
                 return False
         return True
+
+
+# noinspection PyArgumentList
+class DenseSpaceQuery:
+    dense_const = FT(0.03)
+
+    def __init__(self, robot_width, obstacles, robot_num):
+        # init obs for collision detection
+        one_width_square = Polygon_2(get_origin_robot_coord(robot_width))
+        inflated_obstacles = [Polygon_2([p for p in obs]) for obs in obstacles]
+        c_space_obstacles = [minkowski_sum_by_full_convolution_2(one_width_square, obs) for obs in inflated_obstacles]
+        c_space_arrangements = [polygon_with_holes_to_arrangement(obs) for obs in c_space_obstacles]
+        obstacles_arrangement = overlay_multiple_arrangements(c_space_arrangements, merge_faces_by_freespace_flag)
+        self.vertical_decomposition = vertical_decompose(obstacles_arrangement)
+        self.mark_dense()
+        self.obstacles_point_locator = Arr_trapezoid_ric_point_location(self.vertical_decomposition)
+        self.robot_num = robot_num
+
+    # noinspection PyArgumentList
+    def mark_dense(self):
+        assert isinstance(self.vertical_decomposition, Arrangement_2)
+        for f in self.vertical_decomposition.faces():
+            f.data()[DENSE] = False
+        for h_edge in self.vertical_decomposition.edges():
+            if not h_edge.face().data().get(FREESPACE):
+                continue
+            if h_edge.face().is_unbounded():
+                continue
+            if h_edge.source().point().x() != h_edge.target().point().x():
+                continue
+            next_h_edge = h_edge.next()
+            # take care of horizontal dense
+            # skip all edges in a row over me
+            while next_h_edge.source().point().x() == h_edge.source().point().x():
+                next_h_edge = next_h_edge.next()
+            # skip non vertical edges
+            while next_h_edge.source().point().x() != next_h_edge.target().point().x():
+                next_h_edge = next_h_edge.next()
+            if next_h_edge == h_edge:
+                # triangle
+                if FT(-1)*DenseSpaceQuery.dense_const < h_edge.next().point.x() - h_edge.source().point().x() <\
+                        DenseSpaceQuery.dense_const:
+                    h_edge.face().data()[DENSE] = True
+                # in any case (dense or not) we are done with this triangle
+                continue
+            else:
+                if FT(-1)*DenseSpaceQuery.dense_const < next_h_edge.source().point().x() - h_edge.source().point().x()\
+                        < DenseSpaceQuery.dense_const:
+                    h_edge.face().data()[DENSE] = True
+                    continue
+            # take care of non-horizontal dense
+            next_h_edge = h_edge.next()
+            # skip all vertical edges
+            while next_h_edge.source().point().x() == next_h_edge.target().point().x():
+                next_h_edge = next_h_edge.next()
+            first_non_ver_h_edge = next_h_edge
+            next_h_edge = next_h_edge.next()
+            while next_h_edge.source().point().x() == next_h_edge.target().point().x():
+                next_h_edge = next_h_edge.next()
+            second_non_ver_h_edge = next_h_edge
+            if first_non_ver_h_edge.source().point().y() < second_non_ver_h_edge.source().point().y():
+                temp = first_non_ver_h_edge
+                first_non_ver_h_edge = second_non_ver_h_edge
+                second_non_ver_h_edge = temp
+            # first is above second
+            first_min_y = min(first_non_ver_h_edge.source().point().y(), first_non_ver_h_edge.target().point().y())
+            second_max_y = max(second_non_ver_h_edge.source().point().y(), second_non_ver_h_edge.target().point().y())
+            if first_min_y-second_max_y < DenseSpaceQuery.dense_const:
+                h_edge.face().data()[DENSE] = True
+        return
+
+    def is_in_dense_face(self, point):
+        face = Face()
+        # locate can return a vertex or an edge or a face
+        located_obj = self.obstacles_point_locator.locate(point)
+        # if located_obj.is_vertex():
+        #     return False
+        # if located_obj.is_halfedge():
+        #     return False
+        if located_obj.is_face():
+            located_obj.get_face(face)
+            return face.data()[DENSE]
+        return False
+
+    def robots_is_in_dense(self, p):
+        res = []
+        for rid in range(self.robot_num):
+            if self.is_in_dense_face(Point_2(p[2 * rid], p[2 * rid + 1])):
+                res.append(rid)
+        return res

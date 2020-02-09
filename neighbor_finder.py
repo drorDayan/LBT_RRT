@@ -58,6 +58,6 @@ class NeighborsFinder:
         nn = self.__tree_k_nn(point, k)
         heap_nn = [(d, n) for n, d in nn]
         heapq.heapify(heap_nn)
-        return [heapq.heappop(heap_nn)[1] for _ in range(k)]
+        return [heapq.heappop(heap_nn)[1] for _ in range(min(k, len(heap_nn)))]
 
 
