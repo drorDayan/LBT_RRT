@@ -19,17 +19,19 @@ def get_square_mid(robot):
     return [x, y]
 
 
+# noinspection PyArgumentList
 def distance_squared(robot_num, p1, p2):
-    return sum([(p1[i] - p2[i]) * (p1[i] - p2[i]) for i in range(2*robot_num)], FT(0))
+    return Euclidean_distance().transformed_distance(p1, p2)
 
 
 # noinspection PyArgumentList
 def steer(robot_num, near, rand, eta):
     dist = FT(sqrt(distance_squared(robot_num, near, rand).to_double()))
-    if dist < eta:
+    if dist < eta*eta:
         return rand
     else:
-        return Point_d(2*robot_num, [near[i]+(rand[i]-near[i])*eta/dist for i in range(2*robot_num)])
+        return Point_d(2*robot_num,
+                       [near[i]+(rand[i]-near[i])*FT(sqrt((eta/dist).to_double())) for i in range(2*robot_num)])
 
 
 def get_start_and_dest(robots, destination):

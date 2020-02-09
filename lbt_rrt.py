@@ -8,7 +8,7 @@ from rrt_common import *
 # Configurable Variables: #
 
 k_nearest = 50
-steer_eta = FT(0.6)
+steer_eta = FT(0.8)
 
 # Code: #
 
