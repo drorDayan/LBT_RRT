@@ -52,6 +52,9 @@ def generate_path(path, robots, obstacles, destination):
     while True:
         i += 1
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+        # while not collision_detector.is_valid_conf(new_point): #  this hurts performance hard!
+        #     new_point = Point_d(2 * robot_num,
+        #     [FT(random.uniform(min_coord, max_coord)) for _ in range(2 * robot_num)])
         near = neighbor_finder.get_nearest(new_point)
         new = steer(robot_num, near, new_point, steer_eta)
         free = collision_detector.path_collision_free(near, new)
@@ -60,12 +63,20 @@ def generate_path(path, robots, obstacles, destination):
             graph[new] = RrtNode(new, graph[near])
             neighbor_finder.add_points([new])
         else:
-            rids = dense_space_query.robots_is_in_dense(near) + dense_space_query.robots_is_in_dense(new)
+            wights = [min(a, b).to_double() for a, b in
+                      zip(dense_space_query.robots_is_in_dense(near), dense_space_query.robots_is_in_dense(new))]
+            rids = []
+            for r_index in range(robot_num):
+                rval = random.uniform(0, sqrt(wights[r_index]))
+                if rval < 0.2:
+                    rids.append(r_index)
+            new_data = [near[j] for j in range(2 * robot_num)]
             for rid in rids:
-                new_data = [near[j] for j in range(2 * robot_num)]
                 new_data[2 * rid] = new[2 * rid]
                 new_data[2 * rid + 1] = new[2 * rid + 1]
                 my_new = Point_d(2 * robot_num, new_data)
+                new_data[2 * rid] = near[2 * rid]
+                new_data[2 * rid + 1] = near[2 * rid + 1]
                 free = collision_detector.path_collision_free(near, my_new)
                 if free:
                     vertices.append(my_new)

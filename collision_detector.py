@@ -3,6 +3,8 @@ from math import sqrt
 
 FREESPACE = 'freespace'
 DENSE = 'dense'
+DENSE_VISITED = 'dense_visited'
+
 
 # noinspection PyArgumentList
 def polygon_with_holes_to_arrangement(poly):
@@ -207,7 +209,7 @@ class CollisionDetectorSlow:
 
 # noinspection PyArgumentList
 class DenseSpaceQuery:
-    dense_const = FT(0.03)
+    big_value = FT(9999999)
 
     def __init__(self, robot_width, obstacles, robot_num):
         # init obs for collision detection
@@ -221,20 +223,24 @@ class DenseSpaceQuery:
         self.obstacles_point_locator = Arr_trapezoid_ric_point_location(self.vertical_decomposition)
         self.robot_num = robot_num
 
+    # TODO currently we assume no 2 touching free faces (each face has it's own dense value calculated separately)
+    #  this in not good
     # noinspection PyArgumentList
     def mark_dense(self):
         assert isinstance(self.vertical_decomposition, Arrangement_2)
         for f in self.vertical_decomposition.faces():
-            f.data()[DENSE] = False
+            f.data()[DENSE] = DenseSpaceQuery.big_value
         for h_edge in self.vertical_decomposition.edges():
             if not h_edge.face().data().get(FREESPACE):
+                continue
+            if h_edge.face().data().get(DENSE_VISITED):
                 continue
             if h_edge.face().is_unbounded():
                 continue
             if h_edge.source().point().x() != h_edge.target().point().x():
                 continue
             next_h_edge = h_edge.next()
-            # take care of horizontal dense
+            # from here we take care of horizontal dense
             # skip all edges in a row over me
             while next_h_edge.source().point().x() == h_edge.source().point().x():
                 next_h_edge = next_h_edge.next()
@@ -243,35 +249,38 @@ class DenseSpaceQuery:
                 next_h_edge = next_h_edge.next()
             if next_h_edge == h_edge:
                 # triangle
-                if FT(-1)*DenseSpaceQuery.dense_const < h_edge.next().point.x() - h_edge.source().point().x() <\
-                        DenseSpaceQuery.dense_const:
-                    h_edge.face().data()[DENSE] = True
+                diff = h_edge.next().point.x() - h_edge.source().point().x()
+                if diff < FT(0):
+                    diff = diff*FT(-1)
+                h_edge.face().data()[DENSE] = diff
+                h_edge.face().data()[DENSE_VISITED] = True
                 # in any case (dense or not) we are done with this triangle
                 continue
             else:
-                if FT(-1)*DenseSpaceQuery.dense_const < next_h_edge.source().point().x() - h_edge.source().point().x()\
-                        < DenseSpaceQuery.dense_const:
-                    h_edge.face().data()[DENSE] = True
-                    continue
-            # take care of non-horizontal dense
-            next_h_edge = h_edge.next()
-            # skip all vertical edges
-            while next_h_edge.source().point().x() == next_h_edge.target().point().x():
+                diff = next_h_edge.source().point().x() - h_edge.source().point().x()
+                if diff < FT(0):
+                    diff = diff*FT(-1)
+                h_edge.face().data()[DENSE] = diff
+                h_edge.face().data()[DENSE_VISITED] = True
+                # from here take care of non-horizontal dense
+                next_h_edge = h_edge.next()
+                # skip all vertical edges
+                while next_h_edge.source().point().x() == next_h_edge.target().point().x():
+                    next_h_edge = next_h_edge.next()
+                first_non_ver_h_edge = next_h_edge
                 next_h_edge = next_h_edge.next()
-            first_non_ver_h_edge = next_h_edge
-            next_h_edge = next_h_edge.next()
-            while next_h_edge.source().point().x() == next_h_edge.target().point().x():
-                next_h_edge = next_h_edge.next()
-            second_non_ver_h_edge = next_h_edge
-            if first_non_ver_h_edge.source().point().y() < second_non_ver_h_edge.source().point().y():
-                temp = first_non_ver_h_edge
-                first_non_ver_h_edge = second_non_ver_h_edge
-                second_non_ver_h_edge = temp
-            # first is above second
-            first_min_y = min(first_non_ver_h_edge.source().point().y(), first_non_ver_h_edge.target().point().y())
-            second_max_y = max(second_non_ver_h_edge.source().point().y(), second_non_ver_h_edge.target().point().y())
-            if first_min_y-second_max_y < DenseSpaceQuery.dense_const:
-                h_edge.face().data()[DENSE] = True
+                while next_h_edge.source().point().x() == next_h_edge.target().point().x():
+                    next_h_edge = next_h_edge.next()
+                second_non_ver_h_edge = next_h_edge
+                if first_non_ver_h_edge.source().point().y() < second_non_ver_h_edge.source().point().y():
+                    temp = first_non_ver_h_edge
+                    first_non_ver_h_edge = second_non_ver_h_edge
+                    second_non_ver_h_edge = temp
+                # first is above second
+                first_min_y = min(first_non_ver_h_edge.source().point().y(), first_non_ver_h_edge.target().point().y())
+                second_max_y = max(second_non_ver_h_edge.source().point().y(), second_non_ver_h_edge.target().point().y())
+                if first_min_y-second_max_y < diff:
+                    h_edge.face().data()[DENSE] = first_min_y-second_max_y
         return
 
     def is_in_dense_face(self, point):
@@ -285,11 +294,7 @@ class DenseSpaceQuery:
         if located_obj.is_face():
             located_obj.get_face(face)
             return face.data()[DENSE]
-        return False
+        return DenseSpaceQuery.big_value
 
     def robots_is_in_dense(self, p):
-        res = []
-        for rid in range(self.robot_num):
-            if self.is_in_dense_face(Point_2(p[2 * rid], p[2 * rid + 1])):
-                res.append(rid)
-        return res
+        return [self.is_in_dense_face(Point_2(p[2 * rid], p[2 * rid + 1])) for rid in range(self.robot_num)]

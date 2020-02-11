@@ -1,1 +1,1 @@
-python -m cProfile -s cumtime polygons_scene.py >temp
+venv\Scripts\python.exe -m cProfile -s cumtime polygons_scene.py >temp

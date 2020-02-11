@@ -10,6 +10,7 @@ def get_min_max(obstacles):
     assert min_x == min_y and max_x == max_y, "scene should be square"
     min_coord = min(min_x, min_y)
     max_coord = min(max_x, max_y)
+    # if we get robot width  we can be tighter
     return min_coord.to_double(), max_coord.to_double()
 
 
