@@ -225,6 +225,7 @@ class DenseSpaceQuery:
 
     # TODO currently we assume no 2 touching free faces (each face has it's own dense value calculated separately)
     #  this in not good
+    # TODO bug in scene6
     # noinspection PyArgumentList
     def mark_dense(self):
         assert isinstance(self.vertical_decomposition, Arrangement_2)
