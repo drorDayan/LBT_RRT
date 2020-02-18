@@ -15,8 +15,8 @@ def get_min_max(obstacles):
 
 
 def get_square_mid(robot):
-    x = (robot[0].x()+robot[1].x())/FT(2)
-    y = (robot[1].y()+robot[2].y())/FT(2)
+    x = (robot[0].x()+robot[1].x()+robot[2].x()+robot[3].x())/FT(4)
+    y = (robot[0].y()+robot[1].y()+robot[2].y()+robot[3].y())/FT(4)
     return [x, y]
 
 

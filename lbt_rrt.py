@@ -8,7 +8,7 @@ from rrt_common import *
 # Configurable Variables: #
 
 k_nearest = 50
-steer_eta = FT(0.6)
+steer_eta = FT(3)
 
 # Code: #
 
@@ -150,8 +150,8 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
     return False
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_to_run=180,
-                  use_fast_collision_detector=True):
+def generate_path(path, robots, obstacles, destination, epsilon=FT(1), time_to_run=120,
+                  use_fast_collision_detector=False):
     # random.seed(0)  # for tests
     start = time.time()
     print("running, epsilon = ", epsilon, "time to run = ", time_to_run)
@@ -199,4 +199,4 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1/30), time_t
     else:
         print("no path found in time")
         print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices))
-        return len(vertices), FT(999999999999)
+        return len(vertices), FT(99999)

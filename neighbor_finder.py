@@ -2,8 +2,9 @@ from arr2_epec_seg_ex import *
 import heapq
 
 
-smallest_tree_size = 300
-tree_size_mul = 100
+# TODO find best
+smallest_tree_size = 100
+tree_size_mul = 3
 
 
 # noinspection PyArgumentList
@@ -39,6 +40,7 @@ class NeighborsFinder:
                 self.trees[i][1] += points_to_add
                 self.trees[i][2].insert(points_to_add)
                 return
+            num_of_points += len(self.trees[i][1])
             i += 1
         points_to_add = points
         for i in range(0, len(self.trees)):
