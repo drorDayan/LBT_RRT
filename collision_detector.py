@@ -177,13 +177,13 @@ class CollisionDetectorSlow:
         self.point_locator = Arr_landmarks_point_location(single_arrangement)
 
     def is_valid_conf(self, p):
-        epsilon = CollisionDetectorSlow.inflation_epsilon.to_double()
+        eps = CollisionDetectorSlow.inflation_epsilon.to_double()
         for j in range(self.robot_num):
             if not is_in_free_face(self.point_locator, Point_2(p[2 * j], p[2 * j + 1])):
                 return False
             for k in range(j + 1, self.robot_num):
-                if abs(FT.to_double(p[2 * j] - p[2 * k])) < self.robot_width + epsilon and \
-                        abs(FT.to_double(p[2 * j + 1] - p[2 * k + 1])) < self.robot_width + epsilon:
+                if abs(FT.to_double(p[2 * j] - p[2 * k])) < self.robot_width + eps and \
+                        abs(FT.to_double(p[2 * j + 1] - p[2 * k + 1])) < self.robot_width + eps:
                     return False
         return True
 

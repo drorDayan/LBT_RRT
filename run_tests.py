@@ -65,7 +65,8 @@ def test_cost_over_time(robots, obstacles, destination):
     print("running test_cost_over_time")
     path = []
     for fast_cd in [False, True]:
-        eps_s = [0.001, 0.01, 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 20]
+        # eps_s = [0.001, 0.01, 0.1, 0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 20]
+        eps_s = [0.001, 0.01, 0.1, 0.5, 1, 2.5, 5, 7.5, 10, 15, 20]
         res = [[[0, 0] for _ in range(len(time_to_run))] for _ in range(len(eps_s))]
         eps_index = 0
         for eps in eps_s:
@@ -106,8 +107,43 @@ def test_cost_over_time(robots, obstacles, destination):
     print("finish test_cost_over_time")
 
 
+def test_cost_per_vertices(robots, obstacles, destination):
+    num_of_tries = 5
+    num_of_vertices = 20000
+    print("running test_cost_per_time")
+    path = []
+    eps_s = [0.001, 0.01, 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 20]
+    res = [0 for _ in range(len(eps_s))]
+    eps_index = 0
+    for eps in eps_s:
+        for i in range(num_of_tries):
+            start_time = time.time()
+            c_res = lbt_rrt.generate_path(path, robots, obstacles, destination, [9999999], FT(eps), False, num_of_vertices)
+            v, cost = c_res[0]
+            print("time:", time.time()-start_time, "vertices:", v, "cost:", cost, "epsilon:", eps,
+                  "fast_collision_detection:", False)
+            if cost == lbt_rrt.no_path_found_cost:
+                print("invalid data, did not find path")
+                print(eps, i)
+            res[eps_index] += cost.to_double()
+            path = []
+            gc.collect()
+        res[eps_index] /= num_of_tries
+        eps_index += 1
+    # Print data and graphs
+    print(res)
+
+    plt.plot(eps_s, res, color="red")
+    plt.title("cost as a function of epsilon for a fixed number of vertices ("+str(num_of_vertices)+")")
+    plt.xlabel("epsilon")
+    plt.savefig(img_folder+"cost as a function of epsilon for a fixed number of vertices.png")
+    plt.close()
+
+    print("finish test_cost_per_time")
+
+
 # TODO test for success percentage as function of time (and epsilon)
-# TODO better scene
+# TODO better scene?
 # TODO assume we are allowed a fix number of vertices
 # this function is called for testing lbt_rrt with multiple parameters
 def generate_path(path, robots, obstacles, destination):

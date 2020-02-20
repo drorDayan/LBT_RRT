@@ -152,7 +152,7 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
 
 
 def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon=FT(1),
-                  use_fast_collision_detector=False):
+                  use_fast_collision_detector=False, max_num_of_vertices=1000000000):
     # random.seed(0)  # for tests
     if type(time_to_run) != list:
         time_to_run = [time_to_run]
@@ -174,8 +174,8 @@ def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon
     neighbor_finder = NeighborsFinder(vertices)
     curr_time_to_run_index = 0
     res = []
-    while time.time()-start < time_to_run[len(time_to_run)-1]:
-        while time.time()-start < time_to_run[curr_time_to_run_index]:
+    while time.time()-start < time_to_run[len(time_to_run)-1] and len(vertices) < max_num_of_vertices:
+        while time.time()-start < time_to_run[curr_time_to_run_index] and len(vertices) < max_num_of_vertices:
             new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
             while not collision_detector.is_valid_conf(new_point):
                 new_point = Point_d(2 * robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2 * robot_num)])
