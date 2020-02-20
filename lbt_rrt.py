@@ -7,9 +7,9 @@ from math import e, log
 from rrt_common import *
 # Configurable Variables: #
 
-k_nearest = 50
+k_nearest = 25
 steer_eta = FT(3)
-
+no_path_found_cost = FT(1000)
 # Code: #
 
 
@@ -136,7 +136,7 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
     return
 
 
-def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
+def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, add_v=False):
     nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
     valid_neighbors = []
     for neighbor in nn:
@@ -145,14 +145,17 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
             valid_neighbors.append(neighbor)
     if len(valid_neighbors) > 0:
         best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
-        graph.insert_new_node(best, dest_point)
-        return True
-    return False
+        if add_v:
+            graph.insert_new_node(best, dest_point)
+        return True, graph.nodes[best].t_cost + path_cost(robot_num, best, dest_point)
+    return False, no_path_found_cost
 
 
-def generate_path(path, robots, obstacles, destination, epsilon=FT(1), time_to_run=120,
+def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon=FT(1),
                   use_fast_collision_detector=False):
     # random.seed(0)  # for tests
+    if type(time_to_run) != list:
+        time_to_run = [time_to_run]
     start = time.time()
     print("running, epsilon = ", epsilon, "time to run = ", time_to_run)
     robot_num = len(robots)
@@ -169,34 +172,41 @@ def generate_path(path, robots, obstacles, destination, epsilon=FT(1), time_to_r
     vertices = [start_point]
     graph = LbtRrtGraph(robot_num, start_point)
     neighbor_finder = NeighborsFinder(vertices)
-    while time.time()-start < time_to_run:
-        new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
-        while not collision_detector.is_valid_conf(new_point):
-            new_point = Point_d(2 * robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2 * robot_num)])
-        near = neighbor_finder.get_nearest(new_point)
-        new = steer(robot_num, near, new_point, steer_eta)
-        free = collision_detector.path_collision_free(near, new)
-        if free:
-            vertices.append(new)
-            graph.insert_new_node(near, new)
-            neighbor_finder.add_points([new])
+    curr_time_to_run_index = 0
+    res = []
+    while time.time()-start < time_to_run[len(time_to_run)-1]:
+        while time.time()-start < time_to_run[curr_time_to_run_index]:
+            new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+            while not collision_detector.is_valid_conf(new_point):
+                new_point = Point_d(2 * robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2 * robot_num)])
+            near = neighbor_finder.get_nearest(new_point)
+            new = steer(robot_num, near, new_point, steer_eta)
+            free = collision_detector.path_collision_free(near, new)
+            if free:
+                vertices.append(new)
+                graph.insert_new_node(near, new)
+                neighbor_finder.add_points([new])
 
-            # rewiring phase
-            curr_nn_to_consider = neighbor_finder.get_k_nearest(new, 1+int(log(graph.num_of_nodes) * k_rrg))
-            for neighbor in curr_nn_to_consider:
-                consider_edge(graph, neighbor, new, epsilon, collision_detector)
-            for neighbor in curr_nn_to_consider:
-                consider_edge(graph, new, neighbor, epsilon, collision_detector)
+                # rewiring phase
+                curr_nn_to_consider = neighbor_finder.get_k_nearest(new, 1+int(log(graph.num_of_nodes) * k_rrg))
+                for neighbor in curr_nn_to_consider:
+                    consider_edge(graph, neighbor, new, epsilon, collision_detector)
+                for neighbor in curr_nn_to_consider:
+                    consider_edge(graph, new, neighbor, epsilon, collision_detector)
+        curr_time_to_run_index += 1
+        _, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, False)
+        res.append((len(vertices), price))
 
-    if try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num):
+    can_connect, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, True)
+    if can_connect:
         d_path = []
         graph.get_path_to_node(dest_point, d_path)
         for dp in d_path:
             path.append([Point_2(dp[2 * i], dp[2 * i + 1]) for i in range(robot_num)])
         print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices),
               "cost = ", graph.nodes[dest_point].t_cost)
-        return len(vertices), graph.nodes[dest_point].t_cost
     else:
         print("no path found in time")
         print("finished, time= ", time.time() - start, "vertices amount: ", len(vertices))
-        return len(vertices), FT(99999)
+    # res.append((len(vertices), price))
+    return res
