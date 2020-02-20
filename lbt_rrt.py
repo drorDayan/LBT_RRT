@@ -195,7 +195,7 @@ def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon
                     consider_edge(graph, new, neighbor, epsilon, collision_detector)
         curr_time_to_run_index += 1
         _, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, False)
-        res.append((len(vertices), price))
+        res.append([len(vertices), price])
 
     can_connect, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, True)
     if can_connect:
