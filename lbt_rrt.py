@@ -7,7 +7,7 @@ from math import e, log
 from rrt_common import *
 # Configurable Variables: #
 
-k_nearest = 25
+k_nearest = 20
 steer_eta = FT(3)
 no_path_found_cost = FT(1000)
 # Code: #
@@ -121,6 +121,8 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
             g_parent = x[1].g_min_cost[1]
             if collision_detector.path_collision_free(g_parent.v, x[1].v):
                 x[1].t_parent = g_parent
+                # if x[1].t_cost < g_parent.t_cost+g_parent.g_outer_edges[x[1]]:
+                #     print("wtf updated for worth price (in consider_edge)")
                 x[1].t_cost = g_parent.t_cost+g_parent.g_outer_edges[x[1]]
                 heapq.heappop(changed_nodes)
             else:
@@ -136,7 +138,7 @@ def consider_edge(graph, x1, x2, epsilon, collision_detector):
     return
 
 
-def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, add_v=False):
+def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, connected_to_dest, aps):
     nn = neighbor_finder.get_k_nearest(dest_point, k_nearest)
     valid_neighbors = []
     for neighbor in nn:
@@ -145,9 +147,12 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
             valid_neighbors.append(neighbor)
     if len(valid_neighbors) > 0:
         best = min(valid_neighbors, key=lambda n: graph.nodes[n].t_cost + path_cost(robot_num, n, dest_point))
-        if add_v:
+        if not connected_to_dest:
             graph.insert_new_node(best, dest_point)
+        consider_edge(graph, best, dest_point, aps, collision_detector)
         return True, graph.nodes[best].t_cost + path_cost(robot_num, best, dest_point)
+    if connected_to_dest:
+        return True, graph.nodes[dest_point].t_cost
     return False, no_path_found_cost
 
 
@@ -174,6 +179,7 @@ def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon
     neighbor_finder = NeighborsFinder(vertices)
     curr_time_to_run_index = 0
     res = []
+    connected_to_dest = False
     while time.time()-start < time_to_run[len(time_to_run)-1] and len(vertices) < max_num_of_vertices:
         while time.time()-start < time_to_run[curr_time_to_run_index] and len(vertices) < max_num_of_vertices:
             new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
@@ -194,10 +200,11 @@ def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon
                 for neighbor in curr_nn_to_consider:
                     consider_edge(graph, new, neighbor, epsilon, collision_detector)
         curr_time_to_run_index += 1
-        _, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, False)
+        connected_to_dest, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, connected_to_dest, epsilon)
         res.append([len(vertices), price])
-
-    can_connect, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, True)
+    can_connect, price = try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, robot_num, connected_to_dest, epsilon)
+    while len(res) < len(time_to_run):
+        res.append([len(vertices), price])
     if can_connect:
         d_path = []
         graph.get_path_to_node(dest_point, d_path)
