@@ -7,7 +7,7 @@ from math import e, log
 from rrt_common import *
 # Configurable Variables: #
 
-k_nearest = 20
+k_nearest = 5
 steer_eta = FT(3)
 no_path_found_cost = FT(1000)
 # Code: #
@@ -150,13 +150,13 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
         if not connected_to_dest:
             graph.insert_new_node(best, dest_point)
         consider_edge(graph, best, dest_point, aps, collision_detector)
-        return True, graph.nodes[best].t_cost + path_cost(robot_num, best, dest_point)
+        return True, graph.nodes[dest_point].t_cost
     if connected_to_dest:
         return True, graph.nodes[dest_point].t_cost
     return False, no_path_found_cost
 
 
-def generate_path(path, robots, obstacles, destination, time_to_run=120, epsilon=FT(1),
+def generate_path(path, robots, obstacles, destination, time_to_run=1200, epsilon=FT(0.001),
                   use_fast_collision_detector=False, max_num_of_vertices=1000000000):
     # random.seed(0)  # for tests
     if type(time_to_run) != list:
