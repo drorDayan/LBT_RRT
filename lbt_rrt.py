@@ -1,6 +1,7 @@
 import random
 import time
 import heapq
+import sys
 from collision_detector import CollisionDetectorFast, CollisionDetectorSlow
 from neighbor_finder import NeighborsFinder
 from math import e, log
@@ -156,9 +157,11 @@ def try_connect_to_dest(graph, neighbor_finder, dest_point, collision_detector, 
     return False, no_path_found_cost
 
 
-def generate_path(path, robots, obstacles, destination, time_to_run=1200, epsilon=FT(0.001),
+# TO_RUNNER edit default values here
+def generate_path(path, robots, obstacles, destination, time_to_run=60, epsilon=FT(0.001),
                   use_fast_collision_detector=False, max_num_of_vertices=1000000000):
     # random.seed(0)  # for tests
+    sys.setrecursionlimit(999999)
     if type(time_to_run) != list:
         time_to_run = [time_to_run]
     start = time.time()
