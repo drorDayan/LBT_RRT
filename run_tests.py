@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 import gc
 
 # TO_RUNNER: output folder, must end with "/"
-img_folder = "dror6_run_imgs"+"/run2/"
+img_folder = "dror6_run_imgs"+"/run6/"
 
 # TO_RUNNER: epsilons to be checked
-eps_s = [0.1, 0.25, 0.5, 1, 2, 3]
+# eps_s = [0.1, 0.25, 0.5, 1, 1.5, 2]
 # eps_s = [0.001, 0.01, 0.1, 1, 10, 1000000]
 # eps_s = [pow(10, x) for x in range(-5, 6)]
-# eps_s = [0.1*(x+1) for x in range(10)]
+eps_s = [0.2*(x+1) for x in range(6)]
 
 
 # this isn't that useful
@@ -187,7 +187,7 @@ def test_cost_per_vertices(robots, obstacles, destination, num_of_vertices):
     print("finish test_cost_per_vertices")
 
 
-# this function is called for testing lbt_rrt with multiple parameters
+# TO_RUNNER: this function is called for testing lbt_rrt with multiple parameters
 def generate_path(path, robots, obstacles, destination):
     print("running tests")
     test_cost_over_time(robots, obstacles, destination)
