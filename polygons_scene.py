@@ -207,6 +207,10 @@ def set_destinations():
 def animate_path():
   gui.play_queue()
 
+def run_and_animate():
+  generate_path()
+  animate_path()
+
 def run_tests():
   path = []
   path_name = gui.get_field(5)
@@ -222,15 +226,16 @@ if __name__ == "__main__":
   gui = GUI()
   ps = Polygons_scene()
   gui.set_program_name("Multi-robot Motion Planning")
-  gui.set_field(0, "scenes/dror0")
-  gui.set_field(3, "lbt_rrt")
+  gui.set_field(0, "scenes/pabbles_8_3")
+  gui.set_field(3, "srm_rrt")
   gui.set_field(4, "path0.txt")
   gui.set_field(5, "run_tests")
   #gui.set_field(5, "path_out.txt")
   gui.set_logic(0, set_up_scene)
   gui.set_button_text(0, "Load scene")
-  gui.set_button_text(1, "unused")
-  gui.set_logic(2 , set_destinations)
+  gui.set_logic(1, run_and_animate)
+  gui.set_button_text(1, "run_and_animate")
+  gui.set_logic(2, set_destinations)
   gui.set_button_text(2, "Set destinations")
   gui.set_logic(3, generate_path)
   gui.set_button_text(3, "Generate path")

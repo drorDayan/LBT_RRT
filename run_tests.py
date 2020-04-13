@@ -1,5 +1,6 @@
 import lbt_rrt
 import srm_rrt
+import rrt
 from arr2_epec_seg_ex import *
 import time
 import matplotlib.pyplot as plt
@@ -190,7 +191,7 @@ def test_cost_per_vertices(robots, obstacles, destination, num_of_vertices):
 # TO_RUNNER: this function is called for testing lbt_rrt with multiple parameters
 def generate_path(path, robots, obstacles, destination):
     print("running tests")
-    test_cost_over_time(robots, obstacles, destination)
+    # test_cost_over_time(robots, obstacles, destination)
     # test_cost_per_vertices(robots, obstacles, destination, 1000)
     # test_cost_per_vertices(robots, obstacles, destination, 3000)
     # test_cost_per_vertices(robots, obstacles, destination, 5000)
@@ -201,4 +202,19 @@ def generate_path(path, robots, obstacles, destination):
     # test_cost_per_time(robots, obstacles, destination, 180)
     # test_cost_per_time(robots, obstacles, destination, 240)
     # test_cost_per_time(robots, obstacles, destination, 480)
+    num_of_runs = 10
+    print("srm_rrt:")
+    for _ in range(num_of_runs):
+        # print("srm_rrt:")
+        srm_rrt.generate_path(path, robots, obstacles, destination)
+        path = []
+        # print("rrt:")
+        # rrt.generate_path(path, robots, obstacles, destination)
+        gc.collect()
+    print("rrt:")
+    for _ in range(num_of_runs):
+        rrt.generate_path(path, robots, obstacles, destination)
+        path = []
+        gc.collect()
+
     print("finish")

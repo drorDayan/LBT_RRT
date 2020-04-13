@@ -1,0 +1,370 @@
+loaded scene from scenes/pabbles_8_1
+finished, time=  120.00505065917969 vertices amount:  1932 steer_eta =  4
+Generated path via srm_rrt.generate_path
+finished, time=  120.00205731391907 vertices amount:  1876 steer_eta =  4
+Generated path via srm_rrt.generate_path
+         1152077 function calls (1151883 primitive calls) in 635.706 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     17/1    0.000    0.000  635.885  635.885 {built-in method builtins.exec}
+        1    0.007    0.007  635.885  635.885 polygons_scene.py:1(<module>)
+        1  395.543  395.543  635.565  635.565 {built-in method exec_}
+        2    0.005    0.002  240.020  120.010 polygons_scene.py:168(generate_path)
+        2    2.197    1.098  240.006  120.003 srm_rrt.py:37(generate_path)
+    16656  221.369    0.013  221.377    0.013 neighbor_finder.py:16(__tree_k_nn)
+    16492    0.048    0.000  219.131    0.013 neighbor_finder.py:54(get_nearest)
+   131936    9.626    0.000   12.091    0.000 collision_detector.py:151(srm_path_collision_free)
+      164    0.035    0.000    3.068    0.019 srm_rrt.py:27(try_connect_to_dest)
+    74299    1.557    0.000    2.465    0.000 collision_detector.py:128(__two_robot_intersect)
+      164    0.002    0.000    2.404    0.015 neighbor_finder.py:59(get_k_nearest)
+    21412    2.251    0.000    2.263    0.000 collision_detector.py:135(path_collision_free)
+    16492    0.284    0.000    1.214    0.000 rrt_common.py:29(steer)
+    74299    0.908    0.000    0.908    0.000 collision_detector.py:120(get_normal_movement_vector)
+    15612    0.690    0.000    0.690    0.000 rrt_common.py:34(<listcomp>)
+    16492    0.309    0.000    0.415    0.000 srm_rrt.py:54(<listcomp>)
+    16492    0.219    0.000    0.219    0.000 rrt_common.py:24(distance_squared)
+        4    0.000    0.000    0.179    0.045 gui.py:240(set_field)
+   263872    0.082    0.000    0.106    0.000 random.py:372(uniform)
+    16492    0.088    0.000    0.088    0.000 srm_rrt.py:73(<listcomp>)
+16730/16698    0.076    0.000    0.085    0.000 {built-in method builtins.min}
+        2    0.025    0.012    0.069    0.035 collision_detector.py:230(__init__)
+        1    0.000    0.000    0.063    0.063 gui.py:40(__init__)
+        1    0.061    0.061    0.063    0.063 gui.py:44(setupUi)
+     31/9    0.000    0.000    0.044    0.005 <frozen importlib._bootstrap>:978(_find_and_load)
+     30/8    0.000    0.000    0.044    0.005 <frozen importlib._bootstrap>:948(_find_and_load_unlocked)
+     30/9    0.000    0.000    0.042    0.005 <frozen importlib._bootstrap>:663(_load_unlocked)
+    47/12    0.000    0.000    0.040    0.003 <frozen importlib._bootstrap>:211(_call_with_frames_removed)
+     3708    0.038    0.000    0.040    0.000 neighbor_finder.py:30(add_points)
+     16/6    0.000    0.000    0.037    0.006 <frozen importlib._bootstrap_external>:722(exec_module)
+        2    0.009    0.004    0.036    0.018 collision_detector.py:106(__init__)
+        1    0.034    0.034    0.034    0.034 {built-in method show}
+    30/28    0.000    0.000    0.030    0.001 <frozen importlib._bootstrap>:576(module_from_spec)
+        4    0.030    0.007    0.030    0.007 collision_detector.py:44(overlay_multiple_arrangements)
+      7/6    0.000    0.000    0.029    0.005 <frozen importlib._bootstrap_external>:1040(create_module)
+      7/6    0.027    0.004    0.029    0.005 {built-in method _imp.create_dynamic}
+        1    0.000    0.000    0.028    0.028 gui.py:1(<module>)
+        4    0.000    0.000    0.025    0.006 {built-in method builtins.__import__}
+   263872    0.024    0.000    0.024    0.000 {method 'random' of '_random.Random' objects}
+       49    0.000    0.000    0.024    0.000 <frozen importlib._bootstrap>:1009(_handle_fromlist)
+    16493    0.022    0.000    0.022    0.000 {built-in method math.sqrt}
+        2    0.017    0.008    0.017    0.008 collision_detector.py:70(vertical_decompose)
+      164    0.001    0.000    0.014    0.000 neighbor_finder.py:63(<listcomp>)
+     4920    0.013    0.000    0.013    0.000 {built-in method _heapq.heappop}
+    21412    0.012    0.000    0.012    0.000 collision_detector.py:137(<listcomp>)
+       34    0.007    0.000    0.012    0.000 collision_detector.py:10(polygon_with_holes_to_arrangement)
+    16498    0.011    0.000    0.011    0.000 {built-in method time.time}
+    52665    0.010    0.000    0.010    0.000 {built-in method builtins.len}
+    39524    0.009    0.000    0.009    0.000 neighbor_finder.py:56(<lambda>)
+      164    0.008    0.000    0.008    0.000 {built-in method _heapq.heapify}
+        2    0.000    0.000    0.008    0.004 __init__.py:109(import_module)
+        2    0.000    0.000    0.007    0.004 <frozen importlib._bootstrap>:994(_gcd_import)
+       16    0.000    0.000    0.007    0.000 <frozen importlib._bootstrap_external>:793(get_code)
+    16492    0.007    0.000    0.007    0.000 srm_rrt.py:74(<listcomp>)
+        2    0.006    0.003    0.006    0.003 collision_detector.py:111(<listcomp>)
+        2    0.000    0.000    0.006    0.003 collision_detector.py:235(<listcomp>)
+        2    0.000    0.000    0.006    0.003 collision_detector.py:112(<listcomp>)
+        1    0.000    0.000    0.005    0.005 srm_rrt.py:1(<module>)
+        2    0.005    0.003    0.005    0.003 collision_detector.py:234(<listcomp>)
+     3710    0.005    0.000    0.005    0.000 srm_rrt.py:14(__init__)
+       34    0.004    0.000    0.004    0.000 collision_detector.py:13(<listcomp>)
+       30    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap>:882(_find_spec)
+       17    0.004    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:914(get_data)
+       24    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:1272(find_spec)
+       24    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:1240(_get_spec)
+       48    0.000    0.000    0.004    0.000 <frozen importlib._bootstrap_external>:1356(find_spec)
+        1    0.000    0.000    0.003    0.003 random.py:38(<module>)
+      105    0.000    0.000    0.003    0.000 <frozen importlib._bootstrap_external>:74(_path_stat)
+      107    0.003    0.000    0.003    0.000 {built-in method nt.stat}
+        1    0.000    0.000    0.003    0.003 polygons_scene.py:160(set_up_scene)
+        1    0.000    0.000    0.003    0.003 polygons_scene.py:35(load_scene)
+        3    0.000    0.000    0.002    0.001 polygons_scene.py:22(draw_scene)
+        2    0.002    0.001    0.002    0.001 collision_detector.py:246(mark_dense)
+       10    0.000    0.000    0.002    0.000 enum.py:284(__call__)
+       10    0.000    0.000    0.002    0.000 enum.py:389(_create_)
+        2    0.000    0.000    0.002    0.001 polygons_scene.py:65(set_up_animation)
+     4036    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}
+        1    0.000    0.000    0.001    0.001 hashlib.py:54(<module>)
+       10    0.000    0.000    0.001    0.000 enum.py:135(__new__)
+       48    0.000    0.000    0.001    0.000 gui.py:171(add_polygon)
+        1    0.001    0.001    0.001    0.001 read_input.py:22(read_polygon_scene)
+      164    0.001    0.000    0.001    0.000 neighbor_finder.py:61(<listcomp>)
+       40    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:84(_path_is_mode_type)
+       35    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:93(_path_isfile)
+       48    0.001    0.000    0.001    0.000 RPolygon.py:12(__init__)
+       32    0.000    0.000    0.001    0.000 gui.py:166(add_disc)
+       13    0.000    0.000    0.001    0.000 {built-in method builtins.__build_class__}
+        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap_external>:785(source_to_code)
+        1    0.001    0.001    0.001    0.001 {built-in method builtins.compile}
+       32    0.001    0.000    0.001    0.000 RDisc.py:12(__init__)
+        1    0.001    0.001    0.001    0.001 {built-in method setViewport}
+        1    0.000    0.000    0.001    0.001 polygons_scene.py:57(set_destinations)
+       15    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap_external>:523(_compile_bytecode)
+       30    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:504(_init_module_attrs)
+       15    0.000    0.000    0.000    0.000 {built-in method marshal.loads}
+        1    0.000    0.000    0.000    0.000 gui.py:34(GUI)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:956(_cache_bytecode)
+       14    0.000    0.000    0.000    0.000 hashlib.py:116(__get_openssl_constructor)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:961(set_data)
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:951(path_stats)
+      231    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:56(_path_join)
+       17    0.000    0.000    0.000    0.000 {method 'read' of '_io.FileIO' objects}
+        2    0.000    0.000    0.000    0.000 rrt_common.py:5(get_min_max)
+      224    0.000    0.000    0.000    0.000 conversions.py:3(point_2_to_xy)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:105(_write_atomic)
+       31    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:147(__enter__)
+        1    0.000    0.000    0.000    0.000 {connectSlotsByName}
+       79    0.000    0.000    0.000    0.000 enum.py:70(__setitem__)
+        4    0.000    0.000    0.000    0.000 gui.py:225(clear_scene)
+        8    0.000    0.000    0.000    0.000 hashlib.py:73(__get_builtin_constructor)
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:271(cache_from_source)
+    70/38    0.000    0.000    0.000    0.000 {built-in method builtins.max}
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:157(_get_module_lock)
+       39    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:403(cached)
+       10    0.000    0.000    0.000    0.000 enum.py:177(<setcomp>)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1404(_fill_cache)
+       23    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:369(_get_cached)
+       80    0.000    0.000    0.000    0.000 {built-in method addItem}
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:740(create_module)
+       55    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1203(_path_importer_cache)
+        2    0.000    0.000    0.000    0.000 rrt_common.py:37(get_start_and_dest)
+       24    0.000    0.000    0.000    0.000 polygons_scene.py:27(<listcomp>)
+        6    0.000    0.000    0.000    0.000 {built-in method _imp.create_builtin}
+      231    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:58(<listcomp>)
+      343    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
+       24    0.000    0.000    0.000    0.000 polygons_scene.py:30(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {built-in method nt.replace}
+       70    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0x00007FFB7CE659A0}
+      127    0.000    0.000    0.000    0.000 enum.py:376(__setattr__)
+        5    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1190(_path_hooks)
+       23    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1351(_get_spec)
+       48    0.000    0.000    0.000    0.000 RPolygon.py:13(<listcomp>)
+     1683    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}
+        9    0.000    0.000    0.000    0.000 {method 'connect' of 'PyQt5.QtCore.pyqtBoundSignal' objects}
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:98(_path_isdir)
+        2    0.000    0.000    0.000    0.000 rrt_common.py:39(<listcomp>)
+        2    0.000    0.000    0.000    0.000 rrt_common.py:46(validate_input)
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:58(__init__)
+      420    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
+       16    0.000    0.000    0.000    0.000 rrt_common.py:17(get_square_mid)
+        1    0.000    0.000    0.000    0.000 __init__.py:19(<module>)
+        2    0.000    0.000    0.000    0.000 {built-in method nt.listdir}
+        1    0.000    0.000    0.000    0.000 __init__.py:19(find_qt)
+        1    0.000    0.000    0.000    0.000 {built-in method io.open}
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:318(__exit__)
+      304    0.000    0.000    0.000    0.000 collision_detector.py:39(merge_faces_by_freespace_flag)
+        8    0.000    0.000    0.000    0.000 gui.py:246(set_logic)
+        6    0.000    0.000    0.000    0.000 collision_detector.py:30(get_origin_robot_coord)
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_md5}
+        1    0.000    0.000    0.000    0.000 collision_detector.py:1(<module>)
+       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:62(_path_split)
+       31    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:151(__exit__)
+       18    0.000    0.000    0.000    0.000 rrt_common.py:6(<genexpr>)
+       18    0.000    0.000    0.000    0.000 rrt_common.py:7(<genexpr>)
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:719(find_spec)
+       78    0.000    0.000    0.000    0.000 {built-in method builtins.setattr}
+       10    0.000    0.000    0.000    0.000 enum.py:125(__prepare__)
+       30    0.000    0.000    0.000    0.000 enum.py:442(_get_mixins_)
+       23    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:574(spec_from_file_location)
+        1    0.000    0.000    0.000    0.000 {built-in method nt.open}
+        1    0.000    0.000    0.000    0.000 RDisc.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 gui.py:154(retranslateUi)
+        1    0.000    0.000    0.000    0.000 RPolygon.py:1(<module>)
+       10    0.000    0.000    0.000    0.000 enum.py:474(_find_new_)
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:103(release)
+        1    0.000    0.000    0.000    0.000 ms_polygon_segment.py:1(<module>)
+       64    0.000    0.000    0.000    0.000 {built-in method _thread.allocate_lock}
+      263    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:222(_verbose_message)
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:78(acquire)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1445(path_hook_for_FileFinder)
+        1    0.000    0.000    0.000    0.000 gui.py:16(__init__)
+        1    0.000    0.000    0.000    0.000 {built-in method setScene}
+       16    0.000    0.000    0.000    0.000 {built-in method setText}
+       18    0.000    0.000    0.000    0.000 rrt_common.py:8(<genexpr>)
+        1    0.000    0.000    0.000    0.000 {method 'write' of '_io.FileIO' objects}
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:438(_classify_pyc)
+       18    0.000    0.000    0.000    0.000 rrt_common.py:9(<genexpr>)
+        1    0.000    0.000    0.000    0.000 bisect.py:1(<module>)
+       40    0.000    0.000    0.000    0.000 {built-in method builtins.any}
+       32    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:176(cb)
+        2    0.000    0.000    0.000    0.000 genericpath.py:27(isfile)
+       30    0.000    0.000    0.000    0.000 enum.py:453(_find_data_type)
+      263    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 neighbor_finder.py:1(<module>)
+       79    0.000    0.000    0.000    0.000 enum.py:34(_is_sunder)
+       17    0.000    0.000    0.000    0.000 {built-in method addWidget}
+      496    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 RSegment.py:1(<module>)
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:433(spec_from_loader)
+      495    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:536(_code_to_timestamp_pyc)
+       36    0.000    0.000    0.000    0.000 cp1252.py:18(encode)
+        2    0.000    0.000    0.000    0.000 collision_detector.py:110(<listcomp>)
+       79    0.000    0.000    0.000    0.000 enum.py:26(_is_dunder)
+       80    0.000    0.000    0.000    0.000 {built-in method setBrush}
+       59    0.000    0.000    0.000    0.000 enum.py:18(_is_descriptor)
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:471(_validate_timestamp_pyc)
+        1    0.000    0.000    0.000    0.000 linear_path_intersection_test.py:1(<module>)
+       78    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:859(__exit__)
+       47    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:51(_r_long)
+       80    0.000    0.000    0.000    0.000 {built-in method setPen}
+       21    0.000    0.000    0.000    0.000 {built-in method _imp.is_builtin}
+       80    0.000    0.000    0.000    0.000 {built-in method setWidthF}
+       33    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:369(__init__)
+      152    0.000    0.000    0.000    0.000 {method 'rpartition' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:381(_calc_mode)
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:416(parent)
+        3    0.000    0.000    0.000    0.000 gui.py:222(clear_queue)
+       78    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:855(__enter__)
+        3    0.000    0.000    0.000    0.000 gui.py:243(get_field)
+        1    0.000    0.000    0.000    0.000 {built-in method scale}
+        2    0.000    0.000    0.000    0.000 collision_detector.py:233(<listcomp>)
+       22    0.000    0.000    0.000    0.000 {built-in method setObjectName}
+       48    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:36(_relax_case)
+        1    0.000    0.000    0.000    0.000 {built-in method marshal.dumps}
+       48    0.000    0.000    0.000    0.000 {built-in method setPolygon}
+        1    0.000    0.000    0.000    0.000 rrt_common.py:1(<module>)
+      127    0.000    0.000    0.000    0.000 {method 'get' of 'mappingproxy' objects}
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1433(<setcomp>)
+        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1114(__iter__)
+      142    0.000    0.000    0.000    0.000 {built-in method _imp.acquire_lock}
+        1    0.000    0.000    0.000    0.000 os.py:682(__setitem__)
+       24    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:792(find_spec)
+        7    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1048(exec_module)
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:401(_check_name_wrapper)
+       32    0.000    0.000    0.000    0.000 {built-in method setRect}
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:311(__enter__)
+      120    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:321(<genexpr>)
+      142    0.000    0.000    0.000    0.000 {built-in method _imp.release_lock}
+        8    0.000    0.000    0.000    0.000 gui.py:249(set_button_text)
+        2    0.000    0.000    0.000    0.000 ntpath.py:219(dirname)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1319(__init__)
+       10    0.000    0.000    0.000    0.000 enum.py:335(__getattr__)
+       15    0.000    0.000    0.000    0.000 {built-in method nt.getcwd}
+       17    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:35(_new_module)
+       33    0.000    0.000    0.000    0.000 {method 'rsplit' of 'str' objects}
+       49    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
+       36    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_encode}
+       90    0.000    0.000    0.000    0.000 {built-in method builtins.issubclass}
+       30    0.000    0.000    0.000    0.000 {method 'endswith' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 ntpath.py:178(split)
+        1    0.000    0.000    0.000    0.000 {built-in method nt.putenv}
+       31    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:143(__init__)
+        2    0.000    0.000    0.000    0.000 neighbor_finder.py:12(__init__)
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:307(__init__)
+        1    0.000    0.000    0.000    0.000 random.py:88(__init__)
+        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1101(_recalculate)
+        3    0.000    0.000    0.000    0.000 {built-in method text}
+       64    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
+       25    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 random.py:97(seed)
+        1    0.000    0.000    0.000    0.000 RPolygon.py:11(RPolygon)
+        2    0.000    0.000    0.000    0.000 rrt_common.py:40(<listcomp>)
+       10    0.000    0.000    0.000    0.000 enum.py:64(__init__)
+        1    0.000    0.000    0.000    0.000 {built-in method setSceneRect}
+        1    0.000    0.000    0.000    0.000 {built-in method addLayout}
+        2    0.000    0.000    0.000    0.000 {built-in method setWindowTitle}
+       47    0.000    0.000    0.000    0.000 {built-in method from_bytes}
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:232(_requires_builtin_wrapper)
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:748(exec_module)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1097(_get_parent_path)
+       24    0.000    0.000    0.000    0.000 {built-in method _imp.is_frozen}
+        9    0.000    0.000    0.000    0.000 {translate}
+       10    0.000    0.000    0.000    0.000 enum.py:152(<dictcomp>)
+       59    0.000    0.000    0.000    0.000 {built-in method nt.fspath}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1225(_legacy_get_spec)
+        9    0.000    0.000    0.000    0.000 {method 'extend' of 'list' objects}
+        3    0.000    0.000    0.000    0.000 {built-in method clear}
+        2    0.000    0.000    0.000    0.000 cp1252.py:22(decode)
+        1    0.000    0.000    0.000    0.000 _bootlocale.py:11(getpreferredencoding)
+       95    0.000    0.000    0.000    0.000 {method 'lower' of 'str' objects}
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:884(__init__)
+        1    0.000    0.000    0.000    0.000 {built-in method setCentralWidget}
+       50    0.000    0.000    0.000    0.000 {method 'items' of 'mappingproxy' objects}
+       15    0.000    0.000    0.000    0.000 {built-in method _imp._fix_co_filename}
+        1    0.000    0.000    0.000    0.000 gui.py:252(set_program_name)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:194(_lock_unlock_module)
+       30    0.000    0.000    0.000    0.000 enum.py:198(<genexpr>)
+       50    0.000    0.000    0.000    0.000 {method 'partition' of 'str' objects}
+       50    0.000    0.000    0.000    0.000 {method 'add' of 'set' objects}
+        2    0.000    0.000    0.000    0.000 ntpath.py:122(splitdrive)
+        1    0.000    0.000    0.000    0.000 random.py:72(Random)
+        1    0.000    0.000    0.000    0.000 collision_detector.py:177(CollisionDetectorSlow)
+        1    0.000    0.000    0.000    0.000 {function Random.seed at 0x000001E907C15798}
+        1    0.000    0.000    0.000    0.000 os.py:674(__getitem__)
+       59    0.000    0.000    0.000    0.000 {method 'items' of 'collections.OrderedDict' objects}
+       30    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:424(has_location)
+        1    0.000    0.000    0.000    0.000 read_input.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 {built-in method setRenderHints}
+        6    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:929(_sanity_check)
+        1    0.000    0.000    0.000    0.000 RDisc.py:11(RDisc)
+        3    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:46(_w_long)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1081(__init__)
+        2    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
+        1    0.000    0.000    0.000    0.000 {method 'find_loader' of 'zipimport.zipimporter' objects}
+        1    0.000    0.000    0.000    0.000 RSegment.py:11(RSegment)
+        1    0.000    0.000    0.000    0.000 {built-in method setDragMode}
+        1    0.000    0.000    0.000    0.000 {built-in method _locale._getdefaultlocale}
+        4    0.000    0.000    0.000    0.000 {built-in method builtins.sum}
+        1    0.000    0.000    0.000    0.000 conversions.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 {built-in method resize}
+        2    0.000    0.000    0.000    0.000 os.py:744(encodekey)
+        1    0.000    0.000    0.000    0.000 {built-in method math.exp}
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1087(_find_parent_path_names)
+        4    0.000    0.000    0.000    0.000 {method 'extend' of 'bytearray' objects}
+       20    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:12(__init__)
+        7    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1029(__init__)
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:909(get_filename)
+        6    0.000    0.000    0.000    0.000 {built-in method _imp.exec_builtin}
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_sha1}
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_sha512}
+       10    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
+        7    0.000    0.000    0.000    0.000 {built-in method _imp.exec_dynamic}
+        1    0.000    0.000    0.000    0.000 {built-in method sys.exit}
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_sha256}
+       10    0.000    0.000    0.000    0.000 {method 'mro' of 'type' objects}
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1325(<genexpr>)
+        1    0.000    0.000    0.000    0.000 {built-in method sizePolicy}
+       16    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:719(create_module)
+        1    0.000    0.000    0.000    0.000 {method 'union' of 'set' objects}
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:11(Polygons_scene)
+        1    0.000    0.000    0.000    0.000 {built-in method setHorizontalStretch}
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_sha224}
+        1    0.000    0.000    0.000    0.000 {built-in method setStatusBar}
+        1    0.000    0.000    0.000    0.000 {built-in method setEnabled}
+        1    0.000    0.000    0.000    0.000 collision_detector.py:105(CollisionDetectorFast)
+        1    0.000    0.000    0.000    0.000 collision_detector.py:227(DenseSpaceQuery)
+        2    0.000    0.000    0.000    0.000 {built-in method math.log}
+        1    0.000    0.000    0.000    0.000 {built-in method _hashlib.openssl_sha384}
+        3    0.000    0.000    0.000    0.000 os.py:738(check_str)
+       14    0.000    0.000    0.000    0.000 {built-in method builtins.globals}
+        1    0.000    0.000    0.000    0.000 codecs.py:260(__init__)
+        1    0.000    0.000    0.000    0.000 {built-in method hasHeightForWidth}
+        1    0.000    0.000    0.000    0.000 {built-in method setVerticalStretch}
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:765(is_package)
+        1    0.000    0.000    0.000    0.000 random.py:669(SystemRandom)
+        2    0.000    0.000    0.000    0.000 ntpath.py:34(_get_bothseps)
+        1    0.000    0.000    0.000    0.000 neighbor_finder.py:11(NeighborsFinder)
+        3    0.000    0.000    0.000    0.000 {method 'to_bytes' of 'int' objects}
+        4    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
+        4    0.000    0.000    0.000    0.000 {method 'setter' of 'PyQt5.QtCore.pyqtProperty' objects}
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:39(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {built-in method setSizePolicy}
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:47(<listcomp>)
+        2    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 gui.py:15(MainWindowPlus)
+        1    0.000    0.000    0.000    0.000 srm_rrt.py:13(RrtNode)
+        1    0.000    0.000    0.000    0.000 {built-in method _stat.S_ISREG}
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:40(<listcomp>)
+        1    0.000    0.000    0.000    0.000 polygons_scene.py:48(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {built-in method setHeightForWidth}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1159(exec_module)
+        2    0.000    0.000    0.000    0.000 {method 'upper' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.id}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+

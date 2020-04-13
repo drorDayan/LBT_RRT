@@ -3,8 +3,8 @@ import heapq
 
 
 # TODO find best
-smallest_tree_size = 100
-tree_size_mul = 3
+smallest_tree_size = 200
+tree_size_mul = 100
 
 
 # noinspection PyArgumentList

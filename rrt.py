@@ -6,8 +6,8 @@ from rrt_common import *
 
 # Configurable Variables: #
 
-k_nearest = 50
-steer_eta = FT(3)
+k_nearest = 30
+steer_eta = FT(4)
 
 
 class RrtNode:
@@ -52,6 +52,8 @@ def generate_path(path, robots, obstacles, destination):
     while True:
         i += 1
         new_point = Point_d(2*robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2*robot_num)])
+        while not collision_detector.is_valid_conf(new_point):  # this hurts performance hard!
+            new_point = Point_d(2 * robot_num, [FT(random.uniform(min_coord, max_coord)) for _ in range(2 * robot_num)])
         near = neighbor_finder.get_nearest(new_point)
         new = steer(robot_num, near, new_point, steer_eta)
         free = collision_detector.path_collision_free(near, new)

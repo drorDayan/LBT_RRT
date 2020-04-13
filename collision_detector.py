@@ -145,6 +145,22 @@ class CollisionDetectorFast:
                     return False
         return True
 
+    # checks for collisions return:
+    # True if collision free
+    # False, if not
+    def srm_path_collision_free(self, p1, p2, rid):
+        # check for obs collision
+        if do_intersect(self.obstacles_arrangement, Curve_2(Point_2(p1[2*rid], p1[2*rid+1]),
+                                                            Point_2(p2[2*rid], p2[2*rid+1]))):
+            return False
+        # check for robot to robot collision
+        for j in range(self.robot_num):
+            if j == rid:
+                continue
+            if self.__two_robot_intersect(p1, p2, rid, j):
+                return False
+        return True
+
     def is_valid_conf(self, p):
         for robot_index in range(self.robot_num):
             if not is_in_free_face(self.obstacles_point_locator, Point_2(p[robot_index*2], p[robot_index*2+1])):
